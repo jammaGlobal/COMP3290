@@ -1,0 +1,6 @@
+CD20 a1
+main
+    i : int
+begin
+    i =>>*= 6;
+end CD20 a1

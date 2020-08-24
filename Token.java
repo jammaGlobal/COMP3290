@@ -27,6 +27,13 @@ public class Token {
     private int tokNo, ln, col;
     private String lex;
 
+    public Token(){
+        tokNo = 0;
+        ln = 0;
+        col = 0;
+        lex = "";
+    }
+
     public Token(int tokNo, int ln, int col, String lex){
         this.tokNo = tokNo;
         this.ln = ln;

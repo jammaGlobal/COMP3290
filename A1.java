@@ -8,12 +8,12 @@ public class A1{
 	public static void main(String[] args) {
 
 		ArrayList<Token> tokenList = new ArrayList<Token>();
-		CD20Scanner inputScanner;
+		CDScanner inputScanner;
 		String filename;
 
 		try {
 			filename = args[0];
-			inputScanner = new CD20Scanner(filename);
+			inputScanner = new CDScanner(filename);
 			System.out.println(inputScanner);
 	
 		}catch(Exception e){
@@ -21,13 +21,13 @@ public class A1{
             System.out.println(e.toString());
             return;
 		}
-
+		/*
 		while (!inputScanner.eof()){
 			Token currentToken = inputScanner.scan();
-			inputScanner.printToken(Token);
+			inputScanner.printToken(currentToken);
 			tokenList.add(currentToken);
 		}
-		
+		*/
 
 		
 	}
