@@ -87,10 +87,11 @@ public class CDScanner{
                         //no currChar++, holds currChar in attention for next scan()
                         if(Token.checkReserved(buffer) == -1){
                             tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer);
-                            System.out.println("Get: ");
+                            buffer = "";
                         }
                         else{
                             tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token
+                            buffer = "";
                             System.out.println("help: ");
                         }
                     }
@@ -104,7 +105,7 @@ public class CDScanner{
                     }
                     else{
                         tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer); //identifier token
-                        System.out.println("wow: ");
+                        buffer = "";
                     }
                     break;
                 case DELIM_OPERATOR:
@@ -133,7 +134,7 @@ public class CDScanner{
         else
             return new Token(Token.TEQEQ, colNo, linNo, buffer);
     }
-
+/*
     public boolean isNonChar(char c){
         int decimal = (int) c;
 
@@ -162,33 +163,37 @@ public class CDScanner{
         }
 
     }
+    */
     
     public void stateTransition(char c){
         System.out.println(c+ "<-char");
-
 
         //Capturing whitespace and end of lines
         int decimal = (int) c;
 
         if(decimal == 13){
             System.out.println("CR");
+            currChar++;
         }
         //Newline, new line for Windows and Mac
         else if(decimal == 10){
             System.out.println("NL");
             linNo++;
+            currChar++;
         }
         else if(decimal == 9){
             System.out.println("TAB");
+            currChar++;
         }
         else if(Character.isWhitespace(c)){
             System.out.println("WS");
             colNo++;
+            currChar++;
         }
 
         //Identifying beginnings of a Token
 
-        if(Character.isAlphabetic(c)){
+        else if(Character.isAlphabetic(c)){
             currState = STATE.KEYWORD;
             System.out.println("a");
         }

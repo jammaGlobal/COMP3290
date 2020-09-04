@@ -25,13 +25,13 @@ public class A1{
 
 
 		int i = 0;
-		//do{
+		do{
 			Token currentToken = inputScanner.scan();
 			inputScanner.printToken(currentToken);
 			tokenList.add(currentToken);
-			//i++;
+			i++;
 
-		//}while (!inputScanner.eof());
+		}while (!inputScanner.eof());
 
 		for (Token token : tokenList) {
 			System.out.println("TokNo: "+token.getTokenNo()+" Lex: "+ token.getLexeme()+"|");
