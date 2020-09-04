@@ -10,8 +10,8 @@ import java.io.IOException;
 
 public class CDScanner{
 
-    private static enum STATE{
-        START,
+    private enum STATE{
+        START, WHITESPACE,
         KEYWORD, IDENT, DELIM_OPERATOR, 
         COMMENT, SL_COMMENT, ML_COMMENT, 
         INTEGER, FLOAT, 
@@ -38,82 +38,100 @@ public class CDScanner{
         currChar = 0;
         currState = STATE.START;
         Token.popReservedList();
+        System.out.println("# Chars: "+noOfChars);
 
         linNo = 1;
         colNo = 1;
     }
 
-    public void scan(){
-        //Check if whitespace ASCII
+    public Token scan(){
+        //Checks if whitespace ASCII
+        Token tokenFound = null;
 
-        System.out.println("# Chars: "+noOfChars);
+        System.out.println("currChar: "+currChar+"|"+text.charAt(currChar));
         
-        while(isNonChar(text.charAt(currChar))){
+        int i = 0;
+        while(tokenFound == null && i != 10){ 
+            i++;
+
+            System.out.println("Buffer: "+buffer);
+
+
             if(eof()){
                 break;
             }
-            currChar++;
-            System.out.println("currChar: "+currChar);
+
             
-        }
-        
-        
-        //currChar++;
-        //Check if tab ASCII
-        //Check if new line char ASCII (important for linNo)
-        //Check if carriage return char ASCII
-        //Check if end of file ASCII 
+            switch(currState){
 
+                case START:
+                stateTransition(text.charAt(currChar));
+                    break;
+                case WHITESPACE:
 
-        /*
-        switch(currState){
-           // Token tok = new Token();
-
-            case START:
-
-                break;
-            case KEYWORD:
-                if(Character.isLetterOrDigit(text.charAt(currChar))){
-                    buffer.concat(String.valueOf(text.charAt(currChar)));
-                }
-                else if(text.charAt(currChar) == '_'){
-                    buffer.concat(String.valueOf(text.charAt(currChar)));
-                    currState = STATE.IDENT;
-                }
-                else{
-                    Token.
-                    return new Token(Token., colNo, linNo, buffer); //keyword token
-                }
-                break;
-            case IDENT:
-                if(Character.isLetterOrDigit(text.charAt(currChar)) || text.charAt(currChar) == '_'){
-                    buffer.concat(String.valueOf(text.charAt(currChar)));
-                }
-                else{
-                    return new Token(Token.TIDEN, colNo, linNo, buffer); //identifier token
-                }
-                break;
-            case DELIM_OPERATOR:
-                break;
-            case SL_COMMENT:
-                break;
-            case ML_COMMENT:
-                break;
-            case INTEGER:
-                break;
-            case FLOAT:
-                break;
-            case STRINGCONST:
-                break;
-            case ERROR:
-                break;
-            default:
-            //end state
-                
-        }
+                    break;
+                case KEYWORD:
+                    if(Character.isLetterOrDigit(text.charAt(currChar))){
+                        buffer += (String.valueOf(text.charAt(currChar)));
+                       // buffer.concat(String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                    }
+                    else if(text.charAt(currChar) == '_'){
+                        buffer.concat(String.valueOf(text.charAt(currChar)));
+                        currState = STATE.IDENT;
+                        colNo++;    
+                        currChar++;
+                    }
+                    else{
+                        //no currChar++, holds currChar in attention for next scan()
+                        if(Token.checkReserved(buffer) == -1){
+                            tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer);
+                            System.out.println("Get: ");
+                        }
+                        else{
+                            tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token
+                            System.out.println("help: ");
+                        }
+                    }
+                    break;
+                case IDENT:
+                System.out.println("CUM3: ");
+                    if(Character.isLetterOrDigit(text.charAt(currChar)) || text.charAt(currChar) == '_'){
+                        buffer.concat(String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                    }
+                    else{
+                        tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer); //identifier token
+                        System.out.println("wow: ");
+                    }
+                    break;
+                case DELIM_OPERATOR:
+                    break;
+                case SL_COMMENT:
+                    break;
+                case ML_COMMENT:
+                    break;
+                case INTEGER:
+                    break;
+                case FLOAT:
+                    break;
+                case STRINGCONST:
+                    break;
+                default:
+                    System.out.println("HELP2");
+                    
+            }
+            //tokenFound = new Token(Token.TGEQL, colNo, linNo, buffer);
+                    
+        }   //while(token not found)
         stateTransition(text.charAt(currChar));
-        */
-        
+
+        if(tokenFound != null)
+            return tokenFound;
+        else
+            return new Token(Token.TEQEQ, colNo, linNo, buffer);
     }
 
     public boolean isNonChar(char c){
@@ -127,6 +145,7 @@ public class CDScanner{
         //Newline, new line for Windows and Mac
         else if(decimal == 10){
             System.out.println("NL");
+            linNo++;
             return true;
         }
         else if(decimal == 9){
@@ -135,6 +154,7 @@ public class CDScanner{
         }
         else if(Character.isWhitespace(c)){
             System.out.println("WS");
+            colNo++;
             return true;
         }
         else{
@@ -142,27 +162,56 @@ public class CDScanner{
         }
 
     }
-    /*
+    
     public void stateTransition(char c){
+        System.out.println(c+ "<-char");
+
+
+        //Capturing whitespace and end of lines
+        int decimal = (int) c;
+
+        if(decimal == 13){
+            System.out.println("CR");
+        }
+        //Newline, new line for Windows and Mac
+        else if(decimal == 10){
+            System.out.println("NL");
+            linNo++;
+        }
+        else if(decimal == 9){
+            System.out.println("TAB");
+        }
+        else if(Character.isWhitespace(c)){
+            System.out.println("WS");
+            colNo++;
+        }
+
+        //Identifying beginnings of a Token
+
         if(Character.isAlphabetic(c)){
             currState = STATE.KEYWORD;
+            System.out.println("a");
         }
         else if(Character.isDigit(c)){
             currState = STATE.INTEGER;
+            System.out.println("b");
         }
         else if(currChar == '"'){
             currState = STATE.STRINGCONST;
+            System.out.println("c");
         }
         else if(currChar == '/'){
             currState = STATE.COMMENT;
+            System.out.println("d");
         }
         else if(isDelimOperator()){
             currState = STATE.DELIM_OPERATOR;
+            System.out.println("e");
         }
         else{
-            c
+            System.out.println("f");
         }
-    }*/
+    }
 
     public boolean isBufferEmpty(){
         if(buffer.isEmpty()){
@@ -180,7 +229,7 @@ public class CDScanner{
     }
     
     public boolean eof(){
-
+        //System.out.println("currChar: "+currChar);
         if(currChar == noOfChars-1){
             return true;
         }
@@ -193,10 +242,3 @@ public class CDScanner{
     }
     
 }
-
-
-
-
-//public Token commentState(){
-
-//}

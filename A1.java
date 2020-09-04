@@ -8,7 +8,7 @@ import java.nio.file.*;;
 public class A1{
 	public static void main(String[] args) {
 
-		//ArrayList<Token> tokenList = new ArrayList<Token>();
+		ArrayList<Token> tokenList = new ArrayList<Token>();
 		String filename;
 		CDScanner inputScanner;
 
@@ -24,14 +24,18 @@ public class A1{
 		}
 
 
-		
-		do{
-			inputScanner.scan();
+		int i = 0;
+		//do{
+			Token currentToken = inputScanner.scan();
+			inputScanner.printToken(currentToken);
+			tokenList.add(currentToken);
+			//i++;
 
-			// Token currentToken = inputScanner.scan();
-			// inputScanner.printToken(currentToken);
-			// tokenList.add(currentToken);
-		}while (!inputScanner.eof());
+		//}while (!inputScanner.eof());
+
+		for (Token token : tokenList) {
+			System.out.println("TokNo: "+token.getTokenNo()+" Lex: "+ token.getLexeme()+"|");
+		}
 		
 
 
