@@ -101,6 +101,15 @@ public class CDScanner{
                     }
                     break;
                 case DELIM_OPERATOR:
+                    //Check buffer for any
+                    if(buffer.isEmpty()){
+                        tokenFound = new Token(Token.checkReserved(String.valueOf(text.charAt(currChar))), colNo, linNo, String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                    }
+                    break;
+                case COMMENT:
+
                     break;
                 case SL_COMMENT:
                     break;
@@ -124,16 +133,18 @@ public class CDScanner{
                     }
                     break;
                 case FLOAT:
+                    //call
                     if(buffer.endsWith(".")){
                         if(Character.isDigit(text.charAt(currChar))){
                             buffer += (String.valueOf(text.charAt(currChar)));
                             colNo++;
                             currChar++;
                         }
-                        else{
+                        else{   //char after dot (.) can be any non-int char, not just operators
                             tokenFound = new Token(Token.TILIT, colNo, linNo, buffer.substring(0, buffer.length()-1));
-                            buffer = ".";
-                            currState = STATE.DELIM_OPERATOR;
+                            //buffer = ".";
+                            //currState = STATE.DELIM_OPERATOR;
+                            stateTransition(text.charAt(currChar));
                         }
                     }
                     else{
@@ -143,8 +154,8 @@ public class CDScanner{
                             currChar++;
                         }
                         else{
-                            tokenFound = new Token(Token.TFLIT, colNo, linNo, buffer.substring(0, buffer.length()-1));
-                            buffer = ".";
+                            tokenFound = new Token(Token.TFLIT, colNo, linNo, buffer);
+                            buffer = "";
                         }
                     }
 
@@ -189,6 +200,10 @@ public class CDScanner{
     public void stateTransition(char c){
         System.out.println(c+ "<-char");
 
+        if(!buffer.isEmpty()){
+            
+        }
+
         //Capturing whitespace and end of lines
         int decimal = (int) c;
 
@@ -197,6 +212,7 @@ public class CDScanner{
             currChar++;
             currState = STATE.WHITESPACE;
         }
+
         //Newline, new line for Windows and Mac
         else if(decimal == 10){
             System.out.println("NL");
@@ -234,7 +250,7 @@ public class CDScanner{
             currState = STATE.COMMENT;
             System.out.println("d");
         }
-        else if(isDelimOperator()){
+        else if(isDelimOperator(c)){
             currState = STATE.DELIM_OPERATOR;
             System.out.println("e");
         }
@@ -254,8 +270,16 @@ public class CDScanner{
 
     }
 
-    public boolean isDelimOperator(){
-        return true;
+    public boolean isDelimOperator(char c){
+        if(Token.checkReserved(String.valueOf(c)) == -1){
+            return false;
+        }
+        else{
+            System.out.println("yo");
+            return true;
+            
+        }
+        
     }
     
     public boolean eof(){
