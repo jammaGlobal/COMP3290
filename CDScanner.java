@@ -51,16 +51,9 @@ public class CDScanner{
         System.out.println("currChar: "+currChar+"|"+text.charAt(currChar));
         
         int i = 0;
-        while(tokenFound == null && i != 10){ 
-            i++;
+        while(tokenFound == null){ 
 
             System.out.println("Buffer: "+buffer);
-
-
-            if(eof()){
-                break;
-            }
-
             
             switch(currState){
 
@@ -68,18 +61,18 @@ public class CDScanner{
                 stateTransition(text.charAt(currChar));
                     break;
                 case WHITESPACE:
-
+                stateTransition(text.charAt(currChar));
                     break;
                 case KEYWORD:
                     if(Character.isLetterOrDigit(text.charAt(currChar))){
                         buffer += (String.valueOf(text.charAt(currChar)));
-                       // buffer.concat(String.valueOf(text.charAt(currChar)));
                         colNo++;
                         currChar++;
+                        
                     }
                     else if(text.charAt(currChar) == '_'){
-                        buffer.concat(String.valueOf(text.charAt(currChar)));
                         currState = STATE.IDENT;
+                        buffer += (String.valueOf(text.charAt(currChar)));
                         colNo++;    
                         currChar++;
                     }
@@ -97,9 +90,8 @@ public class CDScanner{
                     }
                     break;
                 case IDENT:
-                System.out.println("CUM3: ");
                     if(Character.isLetterOrDigit(text.charAt(currChar)) || text.charAt(currChar) == '_'){
-                        buffer.concat(String.valueOf(text.charAt(currChar)));
+                        buffer += (String.valueOf(text.charAt(currChar)));
                         colNo++;
                         currChar++;
                     }
@@ -115,8 +107,48 @@ public class CDScanner{
                 case ML_COMMENT:
                     break;
                 case INTEGER:
+                    if(Character.isDigit(text.charAt(currChar))){
+                        buffer += (String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                    }
+                    else if(text.charAt(currChar) == '.'){
+                        buffer += (String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                        currState = STATE.FLOAT;
+                    }
+                    else{
+                        tokenFound = new Token(Token.TINTG, colNo, linNo, buffer);
+                        buffer = "";
+                    }
                     break;
                 case FLOAT:
+                    if(buffer.endsWith(".")){
+                        if(Character.isDigit(text.charAt(currChar))){
+                            buffer += (String.valueOf(text.charAt(currChar)));
+                            colNo++;
+                            currChar++;
+                        }
+                        else{
+                            tokenFound = new Token(Token.TILIT, colNo, linNo, buffer.substring(0, buffer.length()-1));
+                            buffer = ".";
+                            currState = STATE.DELIM_OPERATOR;
+                        }
+                    }
+                    else{
+                        if(Character.isDigit(text.charAt(currChar))){
+                            buffer += (String.valueOf(text.charAt(currChar)));
+                            colNo++;
+                            currChar++;
+                        }
+                        else{
+                            tokenFound = new Token(Token.TFLIT, colNo, linNo, buffer.substring(0, buffer.length()-1));
+                            buffer = ".";
+                        }
+                    }
+
+                    
                     break;
                 case STRINGCONST:
                     break;
@@ -124,46 +156,35 @@ public class CDScanner{
                     System.out.println("HELP2");
                     
             }
-            //tokenFound = new Token(Token.TGEQL, colNo, linNo, buffer);
+
+            if(eof()){
+
+                if(Token.checkReserved(buffer) == -1){
+                    tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer);
+                    buffer = "";
+                }
+                else{
+                    tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token
+                    buffer = "";
+                    System.out.println("help: ");
+                }
+                break;
+            }
+            
                     
         }   //while(token not found)
-        stateTransition(text.charAt(currChar));
+        System.out.println("TokenFound: "+tokenFound.getLexeme()+", "+tokenFound.getTokenNo());
+        
+        
+        if(!eof()){
+            stateTransition(text.charAt(currChar));
+        }
 
         if(tokenFound != null)
             return tokenFound;
         else
             return new Token(Token.TEQEQ, colNo, linNo, buffer);
     }
-/*
-    public boolean isNonChar(char c){
-        int decimal = (int) c;
-
-        //Carriage return, precursor to new line for Windows
-        if(decimal == 13){
-            System.out.println("CR");
-            return true;
-        }
-        //Newline, new line for Windows and Mac
-        else if(decimal == 10){
-            System.out.println("NL");
-            linNo++;
-            return true;
-        }
-        else if(decimal == 9){
-            System.out.println("TAB");
-            return true;
-        }
-        else if(Character.isWhitespace(c)){
-            System.out.println("WS");
-            colNo++;
-            return true;
-        }
-        else{
-            return false;
-        }
-
-    }
-    */
     
     public void stateTransition(char c){
         System.out.println(c+ "<-char");
@@ -174,21 +195,25 @@ public class CDScanner{
         if(decimal == 13){
             System.out.println("CR");
             currChar++;
+            currState = STATE.WHITESPACE;
         }
         //Newline, new line for Windows and Mac
         else if(decimal == 10){
             System.out.println("NL");
             linNo++;
             currChar++;
+            currState = STATE.WHITESPACE;
         }
         else if(decimal == 9){
             System.out.println("TAB");
             currChar++;
+            currState = STATE.WHITESPACE;
         }
         else if(Character.isWhitespace(c)){
             System.out.println("WS");
             colNo++;
             currChar++;
+            currState = STATE.WHITESPACE;
         }
 
         //Identifying beginnings of a Token
@@ -235,7 +260,7 @@ public class CDScanner{
     
     public boolean eof(){
         //System.out.println("currChar: "+currChar);
-        if(currChar == noOfChars-1){
+        if(currChar == noOfChars){
             return true;
         }
         else
