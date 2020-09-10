@@ -26,15 +26,21 @@ public class A1{
 
 		int i = 0;
 		do{
-			Token currentToken = inputScanner.scan();
-			inputScanner.printToken(currentToken);
-			tokenList.add(currentToken);
+			try{
+				Token currentToken = inputScanner.scan();
+				inputScanner.printToken(currentToken);
+				tokenList.add(currentToken);
+			}catch(Exception e){
+				
+			}
+
+			
 			i++;
 
 		}while (!inputScanner.eof());
 
 		for (Token token : tokenList) {
-			System.out.println("TokNo: "+token.getTokenNo()+" Lex: "+ token.getLexeme()+"|");
+			System.out.println("TokNo: "+token.getTokenNo()+" Line: "+ token.getLine() +" Column: " +token.getColumn()+" Lex: "+ token.getLexeme()+"|");
 		}
 		
 

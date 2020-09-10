@@ -8,6 +8,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+//TO-DO:
+//-Fix column numbers to be the start of lexeme
+//-Create a end-of-file function to check the nature of the last possible token
+
+
 public class CDScanner{
 
     private enum STATE{
@@ -38,20 +43,30 @@ public class CDScanner{
         currChar = 0;
         currState = STATE.START;
         Token.popReservedList();
-        System.out.println("# Chars: "+noOfChars);
 
         linNo = 1;
         colNo = 1;
     }
 
-    public Token scan(){
+    public Token scan() throws Exception{
         //Checks if whitespace ASCII
         Token tokenFound = null;
 
-        System.out.println("currChar: "+currChar+"|"+text.charAt(currChar));
-        
-        int i = 0;
         while(tokenFound == null){ 
+            // fart
+            if(!buffer.isEmpty()){
+                if(buffer.equals(".")){
+                    tokenFound = new Token(Token.TDOTT, linNo, colNo-1, buffer);
+                    buffer = "";
+                    break;
+                }
+                else if(buffer.equals("-")){
+                    tokenFound = new Token(Token.TMINS, linNo, colNo-1, null);
+                    buffer = "";
+                    break;
+                }
+                //do a buffer excess consumption for "/-" and "/*"
+            }
 
             System.out.println("Buffer: "+buffer);
             
@@ -79,13 +94,12 @@ public class CDScanner{
                     else{
                         //no currChar++, holds currChar in attention for next scan()
                         if(Token.checkReserved(buffer) == -1){
-                            tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer);
+                            tokenFound = new Token(Token.TIDEN, linNo, colNo-buffer.length(), buffer);
                             buffer = "";
                         }
                         else{
-                            tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token
+                            tokenFound = new Token(Token.checkReserved(buffer), linNo, colNo-buffer.length(), buffer); //keyword token
                             buffer = "";
-                            System.out.println("help: ");
                         }
                     }
                     break;
@@ -96,25 +110,180 @@ public class CDScanner{
                         currChar++;
                     }
                     else{
-                        tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer); //identifier token
+                        tokenFound = new Token(Token.TIDEN, linNo, colNo-buffer.length(), buffer); //identifier token
                         buffer = "";
                     }
                     break;
                 case DELIM_OPERATOR:
-                    //Check buffer for any
+                    //Unique one-time intial event for DELIM_OPERATOR STATE
                     if(buffer.isEmpty()){
-                        tokenFound = new Token(Token.checkReserved(String.valueOf(text.charAt(currChar))), colNo, linNo, String.valueOf(text.charAt(currChar)));
+                        buffer += (String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                        
+                    }
+                    else{
+                        
+                        String check = buffer + String.valueOf(text.charAt(currChar));
+
+                        //  The case where the end of a double char operator is identified
+                        if(Token.checkAssignment(check) != -1){
+                            tokenFound = new Token(Token.checkAssignment(check), linNo, colNo-1, null);
+                            buffer = "";
+                            colNo++;
+                            currChar++;
+                        }
+                        // The case where there is a second single char operator found, return current buffer with single char operator and add
+                        // current Char to buffer
+                        else if(Token.checkOperators(String.valueOf(text.charAt(currChar))) != -1 && Token.checkAssignment(check) == -1){
+                            tokenFound = new Token((Token.checkOperators(buffer)), linNo, colNo-1, null);
+                            buffer = String.valueOf(text.charAt(currChar));
+                            colNo++;
+                            currChar++;
+                        }
+                        //The case where there is no operator found at current char, return buffer as single char operator token
+                        else{
+                            tokenFound = new Token((Token.checkOperators(buffer)), linNo, colNo-1, null);
+                            buffer = "";
+                        }
+
+
+/*
+                        if(Token.checkOperators(String.valueOf(text.charAt(currChar))) == -1){
+                            tokenFound = new Token(Token.checkOperators(buffer), linNo, colNo, buffer);
+                            buffer = "";
+                            System.out.println("gay");
+                        }
+                        else if(Token.checkAssignment(check) != -1){
+                            tokenFound = new Token(Token.checkAssignment(check), linNo, colNo, check);
+                            buffer = "";
+                            colNo++;
+                            currChar++;
+                            System.out.println("gayfaggot");
+                        }
+                        else{
+                            tokenFound = new Token(Token.checkOperators(buffer), linNo, colNo, buffer);
+                            buffer = String.valueOf(text.charAt(currChar)); 
+                            colNo++;
+                            currChar++;
+                            System.out.println("gayfaggotnigger");
+                        }
+*/
+                    }
+
+                    break;
+
+                case COMMENT:
+                    if(buffer.isEmpty()){
+                        buffer += (String.valueOf(text.charAt(currChar)));
                         colNo++;
                         currChar++;
                     }
-                    break;
-                case COMMENT:
+                    else if(buffer.length() == 1){
+                        if(text.charAt(currChar) == '-'){
+                            buffer += (String.valueOf(text.charAt(currChar)));
+                            colNo++;
+                            currChar++;
+                            currState = STATE.SL_COMMENT;
+
+                        }
+                        else if(text.charAt(currChar) == '*'){
+                            buffer += (String.valueOf(text.charAt(currChar)));
+                            colNo++;
+                            currChar++;
+                            currState = STATE.ML_COMMENT;
+                        }
+                        else{
+                            tokenFound = new Token(Token.TDIVD, linNo, colNo-1, null);
+                            buffer = "";
+                        }
+                    }
 
                     break;
                 case SL_COMMENT:
+                    if(buffer.length() == 2){
+                        //Single comment state
+                        if(text.charAt(currChar) == '-'){
+                            buffer = "";
+                            colNo++;
+                            currChar++;
+                        }
+                        else{
+                            tokenFound = new Token(Token.TDIVD, linNo, colNo-2, null);
+                            buffer = "-";
+                        }
+                    }
+                    else{
+                        if((int) text.charAt(currChar) == 13){
+                            currChar++;
+                            currState = STATE.WHITESPACE;
+                            System.out.println("xx");
+                        }
+                        else{
+                            colNo++;
+                            currChar++;
+                        }
+
+                    }
+                    
+                    
                     break;
                 case ML_COMMENT:
+                    if(buffer.equals("/*")){
+                        //Multiline comment state
+                        if(text.charAt(currChar) == '*'){
+                            buffer = "";
+                            colNo++;
+                            currChar++;
+                        }
+                        else{
+                            tokenFound = new Token(Token.TDIVD, linNo, colNo-2, null);
+                            buffer = "*";
+                        }
+                    }
+                    else if(buffer.isEmpty()){
+                        if(text.charAt(currChar) == '*'){
+                            buffer = "*";
+                            colNo++;
+                            currChar++;
+                        }
+                        else{
+                            colNo++;
+                            currChar++;
+                        }
+                    }
+                    else if(buffer.equals("*")){
+                        if(text.charAt(currChar) == '*'){
+                            buffer = "**";
+                            colNo++;
+                            currChar++;
+                        }
+                        else{
+                            buffer = "";
+                            colNo++;
+                            currChar++;
+                        }
+                    }
+                    else if(buffer.equals("**")){
+                        if(text.charAt(currChar) == '/'){
+                            buffer = "";
+                            colNo++;
+                            currChar++;
+                            if(eof()){
+
+                            }
+                            else{
+                                stateTransition(text.charAt(currChar));
+                            }
+                        }
+                        else{
+                            buffer = "";
+                            colNo++;
+                            currChar++;
+                        }
+                    }
                     break;
+                //
                 case INTEGER:
                     if(Character.isDigit(text.charAt(currChar))){
                         buffer += (String.valueOf(text.charAt(currChar)));
@@ -128,12 +297,12 @@ public class CDScanner{
                         currState = STATE.FLOAT;
                     }
                     else{
-                        tokenFound = new Token(Token.TINTG, colNo, linNo, buffer);
+                        tokenFound = new Token(Token.TINTG, linNo, colNo-buffer.length(), buffer);
                         buffer = "";
                     }
                     break;
                 case FLOAT:
-                    //call
+                    //instance just after the transition from Integer to Float state
                     if(buffer.endsWith(".")){
                         if(Character.isDigit(text.charAt(currChar))){
                             buffer += (String.valueOf(text.charAt(currChar)));
@@ -141,10 +310,10 @@ public class CDScanner{
                             currChar++;
                         }
                         else{   //char after dot (.) can be any non-int char, not just operators
-                            tokenFound = new Token(Token.TILIT, colNo, linNo, buffer.substring(0, buffer.length()-1));
-                            //buffer = ".";
+                            tokenFound = new Token(Token.TILIT, linNo, colNo-buffer.length(), buffer.substring(0, buffer.length()-1));
+                            buffer = ".";
                             //currState = STATE.DELIM_OPERATOR;
-                            stateTransition(text.charAt(currChar));
+                            //stateTransition(text.charAt(currChar));
                         }
                     }
                     else{
@@ -154,7 +323,7 @@ public class CDScanner{
                             currChar++;
                         }
                         else{
-                            tokenFound = new Token(Token.TFLIT, colNo, linNo, buffer);
+                            tokenFound = new Token(Token.TFLIT, linNo, colNo-buffer.length(), buffer);
                             buffer = "";
                         }
                     }
@@ -162,47 +331,67 @@ public class CDScanner{
                     
                     break;
                 case STRINGCONST:
+                    //
+                    if((int) text.charAt(currChar) == 34){
+                        tokenFound = new Token(Token.TSTRG, linNo, colNo-buffer.length(), buffer);
+                        buffer = "";
+                        colNo++;
+                        currChar++;
+                    }
+                    else if((int) text.charAt(currChar) == 13){
+                        
+                    }
+                    else if((int) text.charAt(currChar) == 10){
+
+                    }
+                    else{
+                        buffer += (String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                    }
                     break;
                 default:
-                    System.out.println("HELP2");
                     
             }
 
             if(eof()){
-
                 if(Token.checkReserved(buffer) == -1){
-                    tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer);
-                    buffer = "";
+                    if(currState == STATE.ML_COMMENT){
+                        
+                    }
+                    else{
+                        tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer);
+                        buffer = "";
+                    }
                 }
                 else{
                     tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token
                     buffer = "";
-                    System.out.println("help: ");
                 }
                 break;
             }
             
                     
         }   //while(token not found)
-        System.out.println("TokenFound: "+tokenFound.getLexeme()+", "+tokenFound.getTokenNo());
-        
         
         if(!eof()){
-            stateTransition(text.charAt(currChar));
+            if(!isBufferEmpty()){
+
+            }
+            else{
+                stateTransition(text.charAt(currChar));
+            }
+                
         }
 
         if(tokenFound != null)
             return tokenFound;
         else
-            return new Token(Token.TEQEQ, colNo, linNo, buffer);
+            throw new Exception("Exception message");
     }
     
     public void stateTransition(char c){
-        System.out.println(c+ "<-char");
-
-        if(!buffer.isEmpty()){
-            
-        }
+        System.out.println("currChar: "+c);
 
         //Capturing whitespace and end of lines
         int decimal = (int) c;
@@ -217,6 +406,7 @@ public class CDScanner{
         else if(decimal == 10){
             System.out.println("NL");
             linNo++;
+            colNo = 1  ;
             currChar++;
             currState = STATE.WHITESPACE;
         }
@@ -236,26 +426,23 @@ public class CDScanner{
 
         else if(Character.isAlphabetic(c)){
             currState = STATE.KEYWORD;
-            System.out.println("a");
         }
         else if(Character.isDigit(c)){
             currState = STATE.INTEGER;
-            System.out.println("b");
         }
-        else if(currChar == '"'){
-            currState = STATE.STRINGCONST;
-            System.out.println("c");
-        }
-        else if(currChar == '/'){
+        else if(c == '/'){
             currState = STATE.COMMENT;
-            System.out.println("d");
         }
         else if(isDelimOperator(c)){
             currState = STATE.DELIM_OPERATOR;
-            System.out.println("e");
+        }
+        else if(decimal == 34){
+            currState = STATE.STRINGCONST;
+            currChar++;
+            colNo++;
         }
         else{
-            System.out.println("f");
+            System.out.println("Illegal Character");
         }
     }
 
@@ -275,7 +462,6 @@ public class CDScanner{
             return false;
         }
         else{
-            System.out.println("yo");
             return true;
             
         }
@@ -285,6 +471,15 @@ public class CDScanner{
     public boolean eof(){
         //System.out.println("currChar: "+currChar);
         if(currChar == noOfChars){
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public boolean eof(int c){
+        //System.out.println("currChar: "+currChar);
+        if(c == noOfChars-1){
             return true;
         }
         else

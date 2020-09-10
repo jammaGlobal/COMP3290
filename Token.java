@@ -32,6 +32,8 @@ public class Token {
     private int tokNo, ln, col;
     private String lex;
     private static HashMap<String, Integer> reservedTokenVal = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> assignmentOperators = new HashMap<String, Integer>();
+    private static HashMap<String, Integer> singleOperators = new HashMap<String, Integer>();
 
     public Token(){
         tokNo = 0;
@@ -110,7 +112,7 @@ public class Token {
             reservedTokenVal.put("+",       TPLUS);
             reservedTokenVal.put("-",       TMINS);
             reservedTokenVal.put("*",       TSTAR);
-            reservedTokenVal.put("/",       TDIVD);
+            //reservedTokenVal.put("/",       TDIVD);
             reservedTokenVal.put("%",       TPERC);
             reservedTokenVal.put("^",       TCART);
             reservedTokenVal.put("<",       TLESS);
@@ -129,6 +131,41 @@ public class Token {
             reservedTokenVal.put("/=",      TDVEQ);
 
         }
+
+        if(assignmentOperators.isEmpty()){
+            assignmentOperators.put("<=",      TLEQL);
+            assignmentOperators.put(">=",      TGEQL);
+            assignmentOperators.put("!=",      TNEQL);
+            assignmentOperators.put("==",      TEQEQ);
+            assignmentOperators.put("+=",      TPLEQ);
+            assignmentOperators.put("-=",      TMNEQ);
+            assignmentOperators.put("*=",      TSTEQ);
+            assignmentOperators.put("/=",      TDVEQ);
+
+        }
+
+        if(singleOperators.isEmpty()){
+            singleOperators.put(";",       TSEMI);
+            singleOperators.put("[",       TLBRK);
+            singleOperators.put("]",       TRBRK);
+            singleOperators.put("(",       TLPAR);
+            singleOperators.put(")",       TRPAR);
+            singleOperators.put(",",       TCOMA);
+            singleOperators.put("=",       TEQUL);
+            singleOperators.put("+",       TPLUS);
+            singleOperators.put("-",       TMINS);
+            singleOperators.put("*",       TSTAR);
+            singleOperators.put("/",       TDIVD);
+            singleOperators.put("%",       TPERC);
+            singleOperators.put("^",       TCART);
+            singleOperators.put("<",       TLESS);
+            singleOperators.put(">",       TGRTR);
+            singleOperators.put("!",       TNOTT);
+            singleOperators.put(":",       TCOLN);
+            singleOperators.put(".",       TDOTT);
+        }
+
+
     }
 
     public static int checkReserved(String lexeme){
@@ -136,6 +173,42 @@ public class Token {
         Integer tokenVal = 0;
         
         for(Map.Entry<String, Integer> special : reservedTokenVal.entrySet()){
+            if(lexeme.equals(special.getKey())){
+                tokenVal = special.getValue();
+            }
+        }
+
+        if(tokenVal == 0){
+            return -1;
+        }
+        else{
+            return tokenVal;
+        }
+    }
+
+    public static int checkOperators(String lexeme){
+        lexeme = lexeme.toLowerCase();  //convert lexeme to lowercase since keywords are not required to be case sensitive
+        Integer tokenVal = 0;
+        
+        for(Map.Entry<String, Integer> special : singleOperators.entrySet()){
+            if(lexeme.equals(special.getKey())){
+                tokenVal = special.getValue();
+            }
+        }
+
+        if(tokenVal == 0){
+            return -1;
+        }
+        else{
+            return tokenVal;
+        }
+    }
+
+    public static int checkAssignment(String lexeme){
+        //lexeme = lexeme.toLowerCase();  //convert lexeme to lowercase since keywords are not required to be case sensitive
+        Integer tokenVal = 0;
+        
+        for(Map.Entry<String, Integer> special : assignmentOperators.entrySet()){
             if(lexeme.equals(special.getKey())){
                 tokenVal = special.getValue();
             }
