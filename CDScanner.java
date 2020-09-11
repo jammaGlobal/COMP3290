@@ -339,10 +339,14 @@ public class CDScanner{
                         currChar++;
                     }
                     else if((int) text.charAt(currChar) == 13){
-                        
+                        currChar++;
                     }
                     else if((int) text.charAt(currChar) == 10){
-
+                        linNo++;
+                        currChar++;
+                        tokenFound = new Token(Token.TUNDF, linNo, colNo-buffer.length(), buffer);
+                        colNo = 0;
+                        buffer = "";
                     }
                     else{
                         buffer += (String.valueOf(text.charAt(currChar)));
@@ -350,17 +354,30 @@ public class CDScanner{
                         currChar++;
                     }
                     break;
+                case ERROR:
+                    tokenFound = new Token(Token.TUNDF, linNo, colNo, String.valueOf(text.charAt(currChar)));
+                    colNo++;
+                    currChar++;
+                    break;
                 default:
                     
             }
 
-            if(eof()){
+            if(eof() && tokenFound == null){
                 if(Token.checkReserved(buffer) == -1){
                     if(currState == STATE.ML_COMMENT){
                         
                     }
+                    else if(currState == STATE.FLOAT){
+                        tokenFound = new Token(Token.TFLIT, colNo-buffer.length(), linNo, buffer);
+                        buffer = "";
+                    }
+                    else if(currState == STATE.INTEGER){
+                        tokenFound = new Token(Token.TILIT, colNo-buffer.length(), linNo, buffer);
+                        buffer = "";
+                    }
                     else{
-                        tokenFound = new Token(Token.TIDEN, colNo, linNo, buffer);
+                        tokenFound = new Token(Token.TIDEN, colNo-buffer.length(), linNo, buffer);
                         buffer = "";
                     }
                 }
@@ -442,8 +459,13 @@ public class CDScanner{
             colNo++;
         }
         else{
+            currState = STATE.ERROR;
             System.out.println("Illegal Character");
         }
+    }
+
+    public Token EOFToken(){
+        return new Token(Token.T_EOF, linNo, colNo, null);
     }
 
     public boolean isBufferEmpty(){
