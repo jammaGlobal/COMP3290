@@ -36,6 +36,8 @@ public class CDScanner{
 
     private int noOfChars;
 
+    private int outChar;
+
     public CDScanner(String text){ 
         this.text = text;
         noOfChars = text.length();
@@ -46,6 +48,8 @@ public class CDScanner{
 
         linNo = 1;
         colNo = 1;
+
+        outChar =0;
     }
 
     public Token scan() throws Exception{
@@ -67,8 +71,6 @@ public class CDScanner{
                 }
                 //do a buffer excess consumption for "/-" and "/*"
             }
-
-            System.out.println("Buffer: "+buffer);
             
             switch(currState){
 
@@ -146,29 +148,6 @@ public class CDScanner{
                             tokenFound = new Token((Token.checkOperators(buffer)), linNo, colNo-1, null);
                             buffer = "";
                         }
-
-
-/*
-                        if(Token.checkOperators(String.valueOf(text.charAt(currChar))) == -1){
-                            tokenFound = new Token(Token.checkOperators(buffer), linNo, colNo, buffer);
-                            buffer = "";
-                            System.out.println("gay");
-                        }
-                        else if(Token.checkAssignment(check) != -1){
-                            tokenFound = new Token(Token.checkAssignment(check), linNo, colNo, check);
-                            buffer = "";
-                            colNo++;
-                            currChar++;
-                            System.out.println("gayfaggot");
-                        }
-                        else{
-                            tokenFound = new Token(Token.checkOperators(buffer), linNo, colNo, buffer);
-                            buffer = String.valueOf(text.charAt(currChar)); 
-                            colNo++;
-                            currChar++;
-                            System.out.println("gayfaggotnigger");
-                        }
-*/
                     }
 
                     break;
@@ -217,7 +196,6 @@ public class CDScanner{
                         if((int) text.charAt(currChar) == 13){
                             currChar++;
                             currState = STATE.WHITESPACE;
-                            System.out.println("xx");
                         }
                         else{
                             colNo++;
@@ -355,9 +333,16 @@ public class CDScanner{
                     }
                     break;
                 case ERROR:
-                    tokenFound = new Token(Token.TUNDF, linNo, colNo, String.valueOf(text.charAt(currChar)));
-                    colNo++;
-                    currChar++;
+                    if(errorStateRemain((text.charAt(currChar)))){
+                        buffer += (String.valueOf(text.charAt(currChar)));
+                        colNo++;
+                        currChar++;
+                    }
+                    else{
+                        tokenFound = new Token(Token.TUNDF, linNo, colNo-buffer.length(), buffer);
+                        buffer = "";
+                    }
+
                     break;
                 default:
                     
@@ -408,32 +393,27 @@ public class CDScanner{
     }
     
     public void stateTransition(char c){
-        System.out.println("currChar: "+c);
 
         //Capturing whitespace and end of lines
         int decimal = (int) c;
-
+        
         if(decimal == 13){
-            System.out.println("CR");
             currChar++;
             currState = STATE.WHITESPACE;
         }
 
         //Newline, new line for Windows and Mac
         else if(decimal == 10){
-            System.out.println("NL");
             linNo++;
             colNo = 1  ;
             currChar++;
             currState = STATE.WHITESPACE;
         }
         else if(decimal == 9){
-            System.out.println("TAB");
             currChar++;
             currState = STATE.WHITESPACE;
         }
         else if(Character.isWhitespace(c)){
-            System.out.println("WS");
             colNo++;
             currChar++;
             currState = STATE.WHITESPACE;
@@ -460,7 +440,49 @@ public class CDScanner{
         }
         else{
             currState = STATE.ERROR;
-            System.out.println("Illegal Character");
+        }
+
+    }
+
+    public boolean errorStateRemain(char c){
+
+        //Capturing whitespace and end of lines
+        int decimal = (int) c;
+
+        if(decimal == 13){
+            return false;
+        }
+
+        //Newline, new line for Windows and Mac
+        else if(decimal == 10){
+            return false;
+        }
+        else if(decimal == 9){
+            return false;
+        }
+        else if(Character.isWhitespace(c)){
+            return false;
+        }
+
+        //Identifying beginnings of a Token
+
+        else if(Character.isAlphabetic(c)){
+            return false;
+        }
+        else if(Character.isDigit(c)){
+            return false;
+        }
+        else if(c == '/'){
+            return false;
+        }
+        else if(isDelimOperator(c)){
+            return false;
+        }
+        else if(decimal == 34){
+            return false;
+        }
+        else{
+            return true;
         }
     }
 
@@ -491,7 +513,6 @@ public class CDScanner{
     }
     
     public boolean eof(){
-        //System.out.println("currChar: "+currChar);
         if(currChar == noOfChars){
             return true;
         }
@@ -500,7 +521,6 @@ public class CDScanner{
     }
 
     public boolean eof(int c){
-        //System.out.println("currChar: "+currChar);
         if(c == noOfChars-1){
             return true;
         }
@@ -509,7 +529,26 @@ public class CDScanner{
     }
     
     public void printToken(Token cToken){
-        //cum
+        
+
+        if(cToken.getTokenNo() == 58 || cToken.getTokenNo() == 59 || 
+            cToken.getTokenNo() == 60 || cToken.getTokenNo() == 61){
+                System.out.print(Token.TPRINT[cToken.getTokenNo()]);
+                System.out.print("");
+                System.out.print(cToken.getLexeme());
+                System.out.print(" ");
+        }
+        else if(cToken.getTokenNo() == 62){
+            System.out.print(Token.TPRINT[cToken.getTokenNo()]);
+            System.out.print("");
+            System.out.print("lexical error "+cToken.getLexeme());
+            System.out.print(" ");
+        }
+        else{
+            System.out.print(Token.TPRINT[cToken.getTokenNo()]);
+            System.out.print("");
+        }
+
     }
     
 }

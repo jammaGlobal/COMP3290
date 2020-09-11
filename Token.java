@@ -29,6 +29,25 @@ public class Token {
 
     TIDEN = 58,	TILIT = 59,	TFLIT = 60,	TSTRG = 61,	TUNDF = 62;
 
+    public static final String TPRINT[] = {
+
+        "TEOF  ",
+
+        "TCD19 ",	"TCONS ",	"TTYPS ",	"TIS   ",	"TARRS ",	"TMAIN ",
+        "TBEGN ",	"TEND  ",	"TARAY ",	"TOF   ",	"TFUNC ",	"TVOID ",
+        "TCNST ",	"TINTG ",	"TREAL ",	"TBOOL ",	"TFOR  ",	"TREPT ",
+        "TUNTL ",	"TIFTH ",	"TELSE ",	"TINPT ",	"TPRIN ",	"TPRLN ",
+        "TRETN ",	"TNOT  ",	"TAND  ",	"TOR   ",	"TXOR  ",	"TTRUE ",
+        "TFALS ",	
+        
+                    "TCOMA ",	"TLBRK ",	"TRBRK ",	"TLPAR ",	"TRPAR ",
+        "TEQUL ",	"TPLUS ",	"TMINS ",	"TSTAR ",	"TDIVD ",	"TPERC ",
+        "TCART ",	"TLESS ",	"TGRTR ",	"TCOLN ",	"TLEQL ",	"TGEQL ",
+        "TNEQL ",	"TEQEQ ",	"TPLEQ ",	"TMNEQ ",	"TSTEQ ",	"TDVEQ ",
+        "TPCEQ ",	"TSEMI ",	"TDOT  ",
+
+        "TIDEN ",	"TILIT ",	"TFLIT ",	"TSTRG ",	"TUNDF "};
+
     private int tokNo, ln, col;
     private String lex;
     private static HashMap<String, Integer> reservedTokenVal = new HashMap<String, Integer>();

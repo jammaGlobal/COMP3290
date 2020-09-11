@@ -1,2 +1,2 @@
 /-yeah
-5432 "hello" ~? array
+5432 "hello" ~?@@@@` array "good"yes"   CD20

@@ -24,8 +24,6 @@ public class A1{
 		}
 
 
-		int i = 0;
-
 		do{
 			do{
 				try{
@@ -36,18 +34,17 @@ public class A1{
 					
 				}
 	
-				
-				i++;
-	
 			}while (!inputScanner.eof());
 
 		}while(!inputScanner.isBufferEmpty());
 
 		tokenList.add(inputScanner.EOFToken());
 
-		for (Token token : tokenList) {
-			System.out.println("TokNo: "+token.getTokenNo()+" Line: "+ token.getLine() +" Column: " +token.getColumn()+" Lex: "+ token.getLexeme()+"|");
-		}
+		
+
+		// for (Token token : tokenList) {
+		// 	System.out.println("TokNo: "+token.getTokenNo()+" Line: "+ token.getLine() +" Column: " +token.getColumn()+" Lex: "+ token.getLexeme()+"|");
+		// }
 		
 
 
