@@ -21,8 +21,7 @@ public class CDScanner{
         COMMENT, SL_COMMENT, ML_COMMENT, 
         INTEGER, FLOAT, 
         STRINGCONST, 
-        ERROR, 
-        END
+        ERROR
     }
 
     private String text;
@@ -37,6 +36,7 @@ public class CDScanner{
     private int noOfChars;
 
     private int outChar;
+    private String outBuffer;
 
     public CDScanner(String text){ 
         this.text = text;
@@ -49,7 +49,8 @@ public class CDScanner{
         linNo = 1;
         colNo = 1;
 
-        outChar =0;
+        outChar = 0;
+        outBuffer = "";
     }
 
     public Token scan() throws Exception{
@@ -348,6 +349,8 @@ public class CDScanner{
                     
             }
 
+           // System.out.print("buffer:"+buffer+"|");
+
             if(eof() && tokenFound == null){
                 if(Token.checkReserved(buffer) == -1){
                     if(currState == STATE.ML_COMMENT){
@@ -359,6 +362,10 @@ public class CDScanner{
                     }
                     else if(currState == STATE.INTEGER){
                         tokenFound = new Token(Token.TILIT, colNo-buffer.length(), linNo, buffer);
+                        buffer = "";
+                    }
+                    else if(currState == STATE.STRINGCONST){
+                        tokenFound = new Token(Token.TUNDF, colNo-buffer.length(), linNo, buffer);
                         buffer = "";
                     }
                     else{
@@ -529,25 +536,42 @@ public class CDScanner{
     }
     
     public void printToken(Token cToken){
-        
+
+        if(outChar >= 66){
+            System.out.print("\n");
+            outChar = 0;
+        }
 
         if(cToken.getTokenNo() == 58 || cToken.getTokenNo() == 59 || 
-            cToken.getTokenNo() == 60 || cToken.getTokenNo() == 61){
-                System.out.print(Token.TPRINT[cToken.getTokenNo()]);
-                System.out.print("");
-                System.out.print(cToken.getLexeme());
-                System.out.print(" ");
+        cToken.getTokenNo() == 60 || cToken.getTokenNo() == 61){
+            outBuffer += Token.TPRINT[cToken.getTokenNo()];
+            outBuffer += "";
+            outBuffer += cToken.getLexeme();
+            outBuffer += " ";
+
+            outChar += outBuffer.length();
+            System.out.print(outBuffer);
         }
         else if(cToken.getTokenNo() == 62){
-            System.out.print(Token.TPRINT[cToken.getTokenNo()]);
-            System.out.print("");
-            System.out.print("lexical error "+cToken.getLexeme());
-            System.out.print(" ");
+            outBuffer += Token.TPRINT[cToken.getTokenNo()];
+            outBuffer += "lexical error ";
+            outBuffer += cToken.getLexeme();
+            outBuffer += " ";
+
+            outChar += outBuffer.length();
+            System.out.print(outBuffer);
         }
         else{
-            System.out.print(Token.TPRINT[cToken.getTokenNo()]);
-            System.out.print("");
+            outBuffer += Token.TPRINT[cToken.getTokenNo()];
+
+            outChar += outBuffer.length();
+            System.out.print(outBuffer);
         }
+
+
+        outBuffer = "";
+    
+        
 
     }
     

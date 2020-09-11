@@ -29,7 +29,7 @@ public class A1{
 				try{
 					Token currentToken = inputScanner.scan();
 					inputScanner.printToken(currentToken);
-					tokenList.add(currentToken);
+					//tokenList.add(currentToken);
 				}catch(Exception e){
 					
 				}
@@ -38,7 +38,8 @@ public class A1{
 
 		}while(!inputScanner.isBufferEmpty());
 
-		tokenList.add(inputScanner.EOFToken());
+		inputScanner.printToken(inputScanner.EOFToken());
+		//tokenList.add(inputScanner.EOFToken());
 
 		
 
