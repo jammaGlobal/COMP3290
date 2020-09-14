@@ -3,12 +3,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import java.nio.file.*;; 
+import java.nio.file.*; 
 
 public class A1{
 	public static void main(String[] args) {
 
-		ArrayList<Token> tokenList = new ArrayList<Token>();
 		String filename;
 		CDScanner inputScanner;
 
@@ -23,13 +22,11 @@ public class A1{
             return;
 		}
 
-
 		do{
 			do{
 				try{
 					Token currentToken = inputScanner.scan();
 					inputScanner.printToken(currentToken);
-					//tokenList.add(currentToken);
 				}catch(Exception e){
 					
 				}
@@ -39,17 +36,5 @@ public class A1{
 		}while(!inputScanner.isBufferEmpty());
 
 		inputScanner.printToken(inputScanner.EOFToken());
-		//tokenList.add(inputScanner.EOFToken());
-
-		
-
-		// for (Token token : tokenList) {
-		// 	System.out.println("TokNo: "+token.getTokenNo()+" Line: "+ token.getLine() +" Column: " +token.getColumn()+" Lex: "+ token.getLexeme()+"|");
-		// }
-		
-
-
-
-		
 	}
 }

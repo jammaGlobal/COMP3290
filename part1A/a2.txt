@@ -1,0 +1,6 @@
+CD20 a2
+main
+    i : int
+begin
+    i = "seven";
+end CD20 a2

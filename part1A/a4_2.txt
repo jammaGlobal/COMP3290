@@ -1,0 +1,26 @@
+CD20 a4_2
+types
+    student is
+        age : int,
+        year : int,
+        isCool : bool
+    end
+
+    students is array [5] of student
+arrays
+    sList : students
+main
+    i : int
+    j : int
+    
+begin
+    i = 1;
+    j = 5;
+    for(i,j;i<j){
+        println "Student ", i;
+        println "age: ", sList[i-1].age;
+        println "year: ", sList[i-1].year;
+        println "Is cool?: ", sList[i-1].isCool;
+    }
+
+end CD20 a4_2

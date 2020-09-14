@@ -1,4 +1,7 @@
+/*
 
+
+*/
 import java.util.ArrayList; 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,13 +11,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-//TO-DO:
-//-Fix column numbers to be the start of lexeme
-//-Create a end-of-file function to check the nature of the last possible token
-
-
 public class CDScanner{
 
+    //Enum values that dictate each possible state within the theoretical state machine the program attempts to simulate
     private enum STATE{
         START, WHITESPACE,
         KEYWORD, IDENT, DELIM_OPERATOR, 
@@ -24,17 +23,23 @@ public class CDScanner{
         ERROR
     }
 
+    //Stores text file as a single String
     private String text;
+    //Used as a buffer to evaluate before returning a Token
     private String buffer;
+    //Used as a pointer counter for which char the Scanner is looking at currently
     private int currChar;
 
+    //Keeps track of what line the Scanner is scanning
     private int linNo;
+    //Keeps track of what column/position the Scanner is scanning
     private int colNo;
-
+    //Denotes the current state machine State
     private STATE currState;
+    //The total number of chars, used to check when the end of file has been reached
+    private int noOfChars; 
 
-    private int noOfChars;
-
+    //Output variables
     private int outChar;
     private String outBuffer;
 
@@ -44,6 +49,8 @@ public class CDScanner{
         buffer = "";
         currChar = 0;
         currState = STATE.START;
+
+        //Populates list of reserved keywords, delimiters and operators
         Token.popReservedList();
 
         linNo = 1;
@@ -53,12 +60,18 @@ public class CDScanner{
         outBuffer = "";
     }
 
+
+    // The main workings of the Scanner, uses a switch statment to act as a state machine with different actions for each state.
+    // Returns a single token tuple (id, line number, column number, lexeme) each call 
     public Token scan() throws Exception{
-        //Checks if whitespace ASCII
+        
         Token tokenFound = null;
 
+        //loops until a Token has been constructed
         while(tokenFound == null){ 
-            // fart
+
+            //Checks specific buffer excess from consuming integers with a dot operator succeeding
+            //and checks the buffer for a minus operator in the case of a possible single line comment failing
             if(!buffer.isEmpty()){
                 if(buffer.equals(".")){
                     tokenFound = new Token(Token.TDOTT, linNo, colNo-1, buffer);
@@ -70,17 +83,21 @@ public class CDScanner{
                     buffer = "";
                     break;
                 }
-                //do a buffer excess consumption for "/-" and "/*"
             }
             
+            //Switch statement containing most states in the state machine, some states are only accessible through other states
             switch(currState){
 
+                //Initial state will immediately state transition dependending on the first char of text file
                 case START:
                 stateTransition(text.charAt(currChar));
                     break;
+                //Forwards to state transition while has the whitespace consuming capabilites
                 case WHITESPACE:
                 stateTransition(text.charAt(currChar));
                     break;
+                //When the start of a new possible token is an alphabetic char it is added to the buffer in the state
+                //transition and the next char is evaluated in the Keyword state
                 case KEYWORD:
                     if(Character.isLetterOrDigit(text.charAt(currChar))){
                         buffer += (String.valueOf(text.charAt(currChar)));
@@ -88,6 +105,7 @@ public class CDScanner{
                         currChar++;
                         
                     }
+                    //If an underscore is consumed then a state transition to the Identifier state occurs
                     else if(text.charAt(currChar) == '_'){
                         currState = STATE.IDENT;
                         buffer += (String.valueOf(text.charAt(currChar)));
@@ -95,7 +113,8 @@ public class CDScanner{
                         currChar++;
                     }
                     else{
-                        //no currChar++, holds currChar in attention for next scan()
+                        //Evaluates if current buffer matches any of the keywords in the Token class
+                        //if it is then a keyword token is returned, if not an identifier token is returned
                         if(Token.checkReserved(buffer) == -1){
                             tokenFound = new Token(Token.TIDEN, linNo, colNo-buffer.length(), buffer);
                             buffer = "";
@@ -106,6 +125,9 @@ public class CDScanner{
                         }
                     }
                     break;
+                //Transitioned to whenever an underscore char is found while in the keyword state
+                //Whenever an alphabetic, numeric or underscore char is found it will be added to the buffer, else
+                //the current buffer will be returned as an Identifier token
                 case IDENT:
                     if(Character.isLetterOrDigit(text.charAt(currChar)) || text.charAt(currChar) == '_'){
                         buffer += (String.valueOf(text.charAt(currChar)));
@@ -117,14 +139,19 @@ public class CDScanner{
                         buffer = "";
                     }
                     break;
+                //Transitioned to whenever the start of a new token is a single-char delimiter/operator
+                //or whenever there is a failed single-line/multi-line comment beginning 
                 case DELIM_OPERATOR:
-                    //Unique one-time intial event for DELIM_OPERATOR STATE
+                    //if the buffer is empty we will add the operator char and suspend an evaluation for the second char
+                    //as the operator could possibly be one of the assignment operators
                     if(buffer.isEmpty()){
                         buffer += (String.valueOf(text.charAt(currChar)));
                         colNo++;
                         currChar++;
                         
                     }
+                    //since the buffer is not empty we will evaluate the buffer and current char as a double char string
+                    //and check if it is an double char assignment operator
                     else{
                         
                         String check = buffer + String.valueOf(text.charAt(currChar));
@@ -152,7 +179,8 @@ public class CDScanner{
                     }
 
                     break;
-
+                //When a slash is found in the state transition it will transition to the Comment state and add it to the
+                //buffer within the state
                 case COMMENT:
                     if(buffer.isEmpty()){
                         buffer += (String.valueOf(text.charAt(currChar)));
@@ -160,6 +188,7 @@ public class CDScanner{
                         currChar++;
                     }
                     else if(buffer.length() == 1){
+                        //if a minus operator succeeds the slash, the state is changed to the Single Line Comment state
                         if(text.charAt(currChar) == '-'){
                             buffer += (String.valueOf(text.charAt(currChar)));
                             colNo++;
@@ -167,12 +196,14 @@ public class CDScanner{
                             currState = STATE.SL_COMMENT;
 
                         }
+                        //if a star operator succeeds the slash, the state is changed to the Multi Line Comment state
                         else if(text.charAt(currChar) == '*'){
                             buffer += (String.valueOf(text.charAt(currChar)));
                             colNo++;
                             currChar++;
                             currState = STATE.ML_COMMENT;
                         }
+                        //else the slash operator is returned as an operator token
                         else{
                             tokenFound = new Token(Token.TDIVD, linNo, colNo-1, null);
                             buffer = "";
@@ -180,19 +211,25 @@ public class CDScanner{
                     }
 
                     break;
+                // Single Line Comment state
                 case SL_COMMENT:
                     if(buffer.length() == 2){
-                        //Single comment state
+                        //Second minus operator succeeds first, stay in Single Line Comment state for subsequent char(s)
                         if(text.charAt(currChar) == '-'){
                             buffer = "";
                             colNo++;
                             currChar++;
                         }
+                        //If a different char succeeds, then slash token is returned and the minus operator substitutes it
+                        //in the buffer
                         else{
                             tokenFound = new Token(Token.TDIVD, linNo, colNo-2, null);
                             buffer = "-";
                         }
                     }
+                    //When buffer is not length 2 the Single Line Comment state is engaged and chars will be consumed without
+                    //adding to the buffer until a new line char is found, in that case the state transitions to whitespace where
+                    //new line characters are handled
                     else{
                         if((int) text.charAt(currChar) == 13){
                             currChar++;
@@ -204,12 +241,12 @@ public class CDScanner{
                         }
 
                     }
-                    
-                    
                     break;
+                
+                // Multiline Comment State
                 case ML_COMMENT:
                     if(buffer.equals("/*")){
-                        //Multiline comment state
+                        //Second star operator succeeds first, stay in Multi Line Comment state for subsequent char(s)
                         if(text.charAt(currChar) == '*'){
                             buffer = "";
                             colNo++;
@@ -220,6 +257,7 @@ public class CDScanner{
                             buffer = "*";
                         }
                     }
+                    //Next if else statements look for possible char sequence to end multi-line comment
                     else if(buffer.isEmpty()){
                         if(text.charAt(currChar) == '*'){
                             buffer = "*";
@@ -248,6 +286,8 @@ public class CDScanner{
                             buffer = "";
                             colNo++;
                             currChar++;
+                            // Condition where End of file cuts off the final char of the comment-end char sequence,
+                            // any other time the 
                             if(eof()){
 
                             }
@@ -259,16 +299,18 @@ public class CDScanner{
                             buffer = "";
                             colNo++;
                             currChar++;
+
                         }
                     }
                     break;
-                //
+                // When start of token is numerical, machine transitions to Integer state
                 case INTEGER:
                     if(Character.isDigit(text.charAt(currChar))){
                         buffer += (String.valueOf(text.charAt(currChar)));
                         colNo++;
                         currChar++;
                     }
+                    //Possible float/real value, transition 
                     else if(text.charAt(currChar) == '.'){
                         buffer += (String.valueOf(text.charAt(currChar)));
                         colNo++;
@@ -354,6 +396,7 @@ public class CDScanner{
             if(eof() && tokenFound == null){
                 if(Token.checkReserved(buffer) == -1){
                     if(currState == STATE.ML_COMMENT){
+                        buffer = "";
                         
                     }
                     else if(currState == STATE.FLOAT){
@@ -372,6 +415,9 @@ public class CDScanner{
                         tokenFound = new Token(Token.TIDEN, colNo-buffer.length(), linNo, buffer);
                         buffer = "";
                     }
+                }
+                else if(Token.checkReserved(buffer) != -1 && currState == STATE.ML_COMMENT){
+                    buffer = "";
                 }
                 else{
                     tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token

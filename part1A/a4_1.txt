@@ -1,0 +1,10 @@
+CD20 a4_1
+main
+    i : int
+    j : int
+    k : real
+begin
+    i = 5;
+    j = 6;
+    k = i/j;
+end CD20 a4_1

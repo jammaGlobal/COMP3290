@@ -1,0 +1,6 @@
+CD20 a3
+main
+    i : int
+begin
+    i = 7;
+end CD20 a3
