@@ -1,0 +1,12 @@
+CD20 a4_3
+main
+    i : int
+    j : int
+    
+begin
+    i = 1;
+    j = 3;
+
+end CD20 a4_3
+
+func 

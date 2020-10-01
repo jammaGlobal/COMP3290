@@ -15,7 +15,7 @@
             "name": "Debug (Launch)-A1<COMP3290_73a8758>",
             "request": "launch",
             "mainClass": "A1",
-            "args": "test1.txt",
+            "args": "a.txt",
             "projectName": "COMP3290_73a8758"
         }
     ]

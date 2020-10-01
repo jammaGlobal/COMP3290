@@ -32,7 +32,8 @@ public class A1{
 				}
 	
 			}while (!inputScanner.eof());
-
+			//sometimes when the end of the file has been reached the buffer will still contain a possible token,
+			//further scan(s) is required
 		}while(!inputScanner.isBufferEmpty());
 
 		inputScanner.printToken(inputScanner.EOFToken());

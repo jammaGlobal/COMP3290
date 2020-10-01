@@ -318,7 +318,7 @@ public class CDScanner{
                         currState = STATE.FLOAT;
                     }
                     else{
-                        tokenFound = new Token(Token.TINTG, linNo, colNo-buffer.length(), buffer);
+                        tokenFound = new Token(Token.TILIT, linNo, colNo-buffer.length(), buffer);
                         buffer = "";
                     }
                     break;
@@ -333,8 +333,7 @@ public class CDScanner{
                         else{   //char after dot (.) can be any non-int char, not just operators
                             tokenFound = new Token(Token.TILIT, linNo, colNo-buffer.length(), buffer.substring(0, buffer.length()-1));
                             buffer = ".";
-                            //currState = STATE.DELIM_OPERATOR;
-                            //stateTransition(text.charAt(currChar));
+
                         }
                     }
                     else{
@@ -391,40 +390,41 @@ public class CDScanner{
                     
             }
 
-           // System.out.print("buffer:"+buffer+"|");
 
-            if(eof() && tokenFound == null){
-                if(Token.checkReserved(buffer) == -1){
-                    if(currState == STATE.ML_COMMENT){
-                        buffer = "";
-                        
+            if(buffer != ""){
+                if(eof() && tokenFound == null){
+                    if(Token.checkReserved(buffer) == -1){
+                        if(currState == STATE.ML_COMMENT){
+                            buffer = "";
+                            
+                        }
+                        else if(currState == STATE.FLOAT){
+                            tokenFound = new Token(Token.TFLIT, colNo-buffer.length(), linNo, buffer);
+                            buffer = "";
+                        }
+                        else if(currState == STATE.INTEGER){
+                            tokenFound = new Token(Token.TILIT, colNo-buffer.length(), linNo, buffer);
+                            buffer = "";
+                        }
+                        else if(currState == STATE.STRINGCONST){
+                            tokenFound = new Token(Token.TUNDF, colNo-buffer.length(), linNo, buffer);
+                            buffer = "";
+                        }
+                        else{
+                            tokenFound = new Token(Token.TIDEN, colNo-buffer.length(), linNo, buffer);
+                            buffer = "";
+                        }
                     }
-                    else if(currState == STATE.FLOAT){
-                        tokenFound = new Token(Token.TFLIT, colNo-buffer.length(), linNo, buffer);
-                        buffer = "";
-                    }
-                    else if(currState == STATE.INTEGER){
-                        tokenFound = new Token(Token.TILIT, colNo-buffer.length(), linNo, buffer);
-                        buffer = "";
-                    }
-                    else if(currState == STATE.STRINGCONST){
-                        tokenFound = new Token(Token.TUNDF, colNo-buffer.length(), linNo, buffer);
+                    else if(Token.checkReserved(buffer) != -1 && currState == STATE.ML_COMMENT){
                         buffer = "";
                     }
                     else{
-                        tokenFound = new Token(Token.TIDEN, colNo-buffer.length(), linNo, buffer);
+                        tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token
                         buffer = "";
                     }
+                    break;
                 }
-                else if(Token.checkReserved(buffer) != -1 && currState == STATE.ML_COMMENT){
-                    buffer = "";
-                }
-                else{
-                    tokenFound = new Token(Token.checkReserved(buffer), colNo, linNo, buffer); //keyword token
-                    buffer = "";
-                }
-                break;
-            }
+        }
             
                     
         }   //while(token not found)
@@ -565,6 +565,7 @@ public class CDScanner{
         
     }
     
+    //checks if the end of file has been reached
     public boolean eof(){
         if(currChar == noOfChars){
             return true;
@@ -573,6 +574,7 @@ public class CDScanner{
             return false;
     }
 
+    
     public boolean eof(int c){
         if(c == noOfChars-1){
             return true;
@@ -581,6 +583,7 @@ public class CDScanner{
             return false;
     }
     
+    //Prints token in spec format
     public void printToken(Token cToken){
 
         if(outChar >= 66){
@@ -592,7 +595,14 @@ public class CDScanner{
         cToken.getTokenNo() == 60 || cToken.getTokenNo() == 61){
             outBuffer += Token.TPRINT[cToken.getTokenNo()];
             outBuffer += "";
-            outBuffer += cToken.getLexeme();
+            if(cToken.getTokenNo() == 61){
+                outBuffer += "\"";
+                outBuffer += cToken.getLexeme();
+                outBuffer += "\"";
+            }
+            else{
+                outBuffer += cToken.getLexeme();
+            }
             outBuffer += " ";
 
             outChar += outBuffer.length();

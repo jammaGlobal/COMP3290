@@ -1,0 +1,210 @@
+NPROG <program> ::= CD20 <id> <globals> <funcs> <mainbody>
+NGLOB <globals> ::= <consts> <types> <arrays>
+Special <consts> ::= constants <initlist> | ε
+
+NILIST <initlist> ::= <init> , <initlist>
+Special <initlist> ::= <init>
+    -left factoring-
+        <initlist> ::= <init> opt_comma
+        opt_comma ::= , <initlist> | ε
+
+
+NINIT <init> ::= <id> = <expr>
+
+Special <types> ::= types <typelist> | ε
+
+Special <arrays> ::= arrays <arrdecls>
+Special <arrays> ::= ε
+
+NFUNCS <funcs> ::= <func> <funcs>
+Special <funcs> ::= ε
+NMAIN <mainbody> ::= main <slist> begin <stats> end CD20 <id>
+
+NSDLST <slist> ::= <sdecl> , <slist>
+Special <slist> ::= <sdecl>
+Special <slist> ::= ε
+    -left factoring-
+        <slist> ::= <sdecl> opt_slist | e
+        opt_slist ::= , <slist> | e
+
+
+
+NTYPEL <typelist> ::= <type> <typelist>
+Special <typelist> ::= <type>
+    -left factoring-
+        <typelist> ::= <type> opt_typelist
+        opt_typelist ::= <typelist> | ε
+
+NRTYPE <type> ::= <structid> is <fields> end
+NATYPE <type> ::= <typeid> is array [ <expr> ] of <structid>
+
+NFLIST <fields> ::= <sdecl> , <fields>
+Special <fields> ::= <sdecl>
+    -left factoring-
+        <fields> ::= <sdecl> opt_fields
+        opt_fields ::= , <fields> | ε
+
+NSDECL <sdecl> ::= <id> : <stype>
+
+NALIST <arrdecls> ::= <arrdecl> , <arrdecls>
+Special <arrdecls> ::= <arrdecl>
+    -left factoring-
+        <arrdecls> ::= <arrdecl> opt_arrdecls
+        opt_arrdecls ::= , <arrdecls> | ε
+
+NARRD <arrdecl> ::= <id> : <typeid>
+NFUND <func> ::= func <id> ( <plist> ) : <rtype> <funcbody>
+Special <rtype> ::= <stype> | void
+Special <plist> ::= <params> | ε
+
+NPLIST <params> ::= <param> , <params>
+Special <params> ::= <param>
+    -left factoring-
+        <params> ::= <param> opt_params
+        opt_params ::= , <params> | e
+
+NSIMP <param> ::= <sdecl>
+NARRP <param> ::= <arrdecl>
+NARRC <param> ::= const <arrdecl>
+Special <funcbody> ::= <locals> begin <stats> end
+Special <locals> ::= <dlist> | ε
+
+NDLIST <dlist> ::= <decl> , <dlist>
+Special <dlist> ::= <decl>
+    -left factoring-
+        <dlist> ::= <decl> opt_dlist
+        opt_dlist ::= , <dlist> | e
+
+
+Special <decl> ::= <sdecl> | <arrdecl>
+Special <stype> ::= int | real | bool
+
+NSTATS <stats> ::= <stat> ; <stats> | <strstat> <stats>
+Special <stats> ::= <stat> ; | <strstat>
+    -left factoring-
+        <stats> ::= <stat> ; opt_stats_strstat | <strstat> <stats>
+        opt_stats_strstat ::= <stats> | <strstat>
+
+
+
+
+
+Special <strstat> ::= <forstat> | <ifstat>
+Special <stat> ::= <reptstat> | <asgnstat>
+Special <stat> ::= <iostat> | <callstat> | <returnstat>
+NFOR <forstat> ::= for ( <asgnlist> ; <bool> ) <stats> end
+NREPT <repstat> ::= repeat ( <asgnlist> ) <stats> until <bool>
+
+NASGNS <asgnlist> ::= <asgnstat> , <asgnlist>
+Special <asgnlist> ::= <asgnstat>
+    -left factoring-
+        <asgnlist> ::= <asgnstat> opt_asgnlist
+        opt_asgnlist ::= , <asgnlist> | e
+
+NIFTH <ifstat> ::= if ( <bool> ) <stats> end
+NIFTE <ifstat> ::= if ( <bool> ) <stats> else <stats> end
+    -left factoring-
+        <ifstat> ::= if ( <bool> ) <stats> opt_else_stats end
+        opt_else_stats ::= else <stats> | e 
+
+Special <asgnstat> ::= <var> <asgnop> <bool>
+NASGN <asgnop> ::= =
+NPLEQ <asgnop> ::= +=
+NMNEQ <asgnop> ::= -=
+NSTEQ <asgnop> ::= *=
+NDVEQ <asgnop> ::= /=
+NINPUT <iostat> ::= input <vlist>
+NPRINT <iostat> ::= print <prlist>
+NPRLN <iostat> ::= println <prlist>
+NCALL <callstat> ::= <id> ( <elist> ) | <id> ( )
+
+NRETN <returnstat> ::= return | return <expr>
+    -left factoring-
+        <returnstat> ::= return opt_expr
+        opt_expr ::= <expr> | e
+
+
+NVLIST <vlist> ::= <var> , <vlist>
+Special <vlist> ::= <var>
+    -left factoring-
+        <vlist> ::= <var> opt_vlist
+        opt_vlist = , <vlist> | e
+
+NSIMV <var> ::= <id>
+NARRV <var> ::= <id>[<expr>] . <id>
+    -left factoring-
+        <var> ::= <id> opt_expr
+        opt_expr ::= [<expr>] . <id> | e 
+
+NEXPL <elist> ::= <bool> , <elist>
+Special <elist> ::= <bool>
+    -left factoring-
+        <elist> ::= <bool> opt_elist 
+        opt_elist ::= , <elist> | e
+
+NBOOL <bool> ::= <bool><logop> <rel>
+Special <bool> ::= <rel>
+    -left recursion-
+        <bool> ::= <rel> rec_bool
+        rec_bool ::= <logop> <rel> rec_bool | e 
+
+NNOT <rel> ::= not <expr> <relop> <expr>
+
+Special <rel> ::= <expr> <relop> <expr>
+Special <rel> ::= <expr>
+    -left factoring-
+        <rel> ::= <expr> opt_relop
+        opt_relop ::= <relop> <expr> | e
+
+
+NAND <logop> ::= and
+NOR <logop> ::= or
+NXOR <logop> ::= xor
+NEQL <relop> ::= ==
+NNEQ <relop> ::= !=
+NGRT <relop> ::= >
+NGEQ <relop> ::= >=
+NLEQ <relop> ::= <=
+NLSS <relop> ::= <
+
+
+NADD <expr> ::= <expr> + <term>
+NSUB <expr> ::= <expr> - <term>
+Special <expr> ::= <term>
+    -left recursion-
+        <expr> ::= <term> rec_expr
+        rec_expr ::= + <term> rec_expr | - <term> rec_expr | e
+
+
+NMUL <term> ::= <term> * <fact>
+NDIV <term> ::= <term> / <fact>
+NMOD <term> ::= <term> % <fact>
+Special <term> ::= <fact>
+    -left recursion-
+        <term> ::= <fact> rec_term
+        rec_term ::= * <fact> rec_term | / <fact> rec_term | % <fact> rec_term | e
+
+NPOW <fact> ::= <fact> ^ <exponent>
+Special <fact> ::= <exponent>
+    -left recursion-
+        <fact> ::= <exponent> rec_fact
+        rec_fact ::= ^ <exponent> rec_fact | e
+
+Special <exponent> ::= <var>
+NILIT <exponent> ::= <intlit>
+NFLIT <exponent> ::= <reallit>
+Special <exponent> ::= <fncall>
+NTRUE <exponent> ::= true
+NFALS <exponent> ::= false
+Special <exponent> ::= ( <bool> )
+NFCALL <fncall> ::= <id> ( <elist> ) | <id> ( )
+
+NPRLST <prlist> ::= <printitem> , <prlist>
+Special <prlist> ::= <printitem>
+    -left factoring-
+        <prlist> ::= <printitem> opt_printlist
+        opt_printlist ::= , <prlist> | e
+
+
+Special <printitem> ::= <expr>
+NSTRG <printitem> ::= <string>

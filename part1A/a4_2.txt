@@ -1,4 +1,4 @@
-CD20 a4_2
+CD20 a4_3
 types
     student is
         age : int,
@@ -15,7 +15,22 @@ main
     
 begin
     i = 1;
-    j = 5;
+    j = 3;
+
+    sList[0].age = 2;
+    sList[0].year = 3;
+    sList[0].isCool = false;
+    sList[1].age = 68;
+    sList[1].year = 1;
+    sList[1].isCool = false;
+    sList[2].age = 25;
+    sList[2].year = 3;
+    sList[2].isCool = true;
+    sList[3].age = 80;
+    sList[3].year = 1;
+    sList[3].isCool = false;
+
+
     for(i,j;i<j){
         println "Student ", i;
         println "age: ", sList[i-1].age;
@@ -23,4 +38,4 @@ begin
         println "Is cool?: ", sList[i-1].isCool;
     }
 
-end CD20 a4_2
+end CD20 a4_3
