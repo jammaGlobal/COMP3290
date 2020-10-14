@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.nio.file.*; 
 
-public class A1{
+public class A2{
 	public static void main(String[] args) {
 
 		String filename;
 		CDScanner inputScanner;
+		ArrayList<Token> tokenList = new ArrayList<Token>();
 
 		try {
 			filename = args[0]; 
@@ -26,7 +27,8 @@ public class A1{
 			do{
 				try{
 					Token currentToken = inputScanner.scan();
-					inputScanner.printToken(currentToken);
+					tokenList.add(currentToken);
+					//inputScanner.printToken(currentToken);
 				}catch(Exception e){
 					
 				}
@@ -36,6 +38,12 @@ public class A1{
 			//further scan(s) is required
 		}while(!inputScanner.isBufferEmpty());
 
-		inputScanner.printToken(inputScanner.EOFToken());
+		//inputScanner.printToken(inputScanner.EOFToken());
+		tokenList.add(inputScanner.EOFToken());
+
+		CDParser parser = new CDParser(tokenList);
+		parser.startParse();
+		parser.printProgramListing();
+		parser.printErrorListing();
 	}
 }

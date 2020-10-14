@@ -91,7 +91,7 @@ public class Token {
 
             //adds keywords into list of reserved characters/character sequences
             reservedTokenVal.put("cd20",     TCD20);
-            reservedTokenVal.put("constants",TCNST);
+            reservedTokenVal.put("constants",TCONS);
             reservedTokenVal.put("types",    TTYPS);
             reservedTokenVal.put("is",       TTTIS);
             reservedTokenVal.put("arrays",   TARRS);
@@ -102,7 +102,7 @@ public class Token {
             reservedTokenVal.put("of",       TTTOF);
             reservedTokenVal.put("func",     TFUNC);
             reservedTokenVal.put("void",     TVOID);
-            reservedTokenVal.put("const",    TCONS);
+            reservedTokenVal.put("const",    TCNST);
             reservedTokenVal.put("int",      TINTG);
             reservedTokenVal.put("real",    TREAL);
             reservedTokenVal.put("bool",    TBOOL);

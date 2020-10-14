@@ -1,0 +1,12 @@
+CD20 yo 
+constants
+    COUNT = 10,
+    YEAH = 5
+types
+    mark is
+    id : int,
+    midtem : real,
+    final : 
+    
+    main
+end CD20 yo

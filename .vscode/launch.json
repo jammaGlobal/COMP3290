@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - A2",
+            "request": "launch",
+            "mainClass": "A2",
+            "projectName": "COMP3290_c1a06eec"
+        },
+        {
+            "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}"
@@ -17,6 +24,15 @@
             "mainClass": "A1",
             "args": "a.txt",
             "projectName": "COMP3290_73a8758"
+        },
+        {
+            "type": "java",
+            "name": "A2 debug",
+            "request": "launch",
+            "mainClass": "A2",
+            "args": "test.txt",
+            "projectName": "COMP3290_c1a06eec",
+            "cwd": "C:\\Users\\jamey\\Documents\\uniCourses\\COMP3290\\Assignments\\COMP3290\\part2_parser"
         }
     ]
 }
