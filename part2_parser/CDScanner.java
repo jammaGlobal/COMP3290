@@ -78,7 +78,7 @@ public class CDScanner{
                     buffer = "";
                     break;
                 }
-                else if(buffer.equals("-")){
+                else if(buffer.equals("-") && currState == STATE.SL_COMMENT){
                     tokenFound = new Token(Token.TMINS, linNo, colNo-1, null);
                     buffer = "";
                     break;
