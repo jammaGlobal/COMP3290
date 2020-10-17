@@ -48,7 +48,7 @@ public class NNOT{
             expr.setNodeID("NSUB");
         }
 
-        StNode rec_expr = new StNode();
+        StNode rec_expr = rec_expr(tokenList,sTable);
         expr.setRight(rec_expr);
         
         return expr;
@@ -136,26 +136,32 @@ public class NNOT{
         
         if(tokenList.get(0).getTokenNo() == 50){
             relop.setNodeID("NEQL");
+            tokenList.remove(0);
             return relop;
         }
         else if(tokenList.get(0).getTokenNo() == 49){
             relop.setNodeID("NNEQ");
+            tokenList.remove(0);
             return relop;
         }
         else if(tokenList.get(0).getTokenNo() == 45){
             relop.setNodeID("NGRT");
+            tokenList.remove(0);
             return relop;
         }
         else if(tokenList.get(0).getTokenNo() == 48){
             relop.setNodeID("NGEQ");
+            tokenList.remove(0);
             return relop;
         }
         else if(tokenList.get(0).getTokenNo() == 47){
             relop.setNodeID("NLEQ");
+            tokenList.remove(0);
             return relop;
         }
         else if(tokenList.get(0).getTokenNo() == 44){
             relop.setNodeID("NLSS");
+            tokenList.remove(0);
             return relop;
         }
         else{

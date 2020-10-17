@@ -50,9 +50,9 @@ public class NTYPEL{
 
         if(tokenList.get(0).getTokenNo() == 4){
             tokenList.remove(0);
-            if(tokenList.get(0).getTokenNo() == 5){
+            if(tokenList.get(0).getTokenNo() == 9){
                 structOrTypeID.setNodeID("NATYPE");
-                
+                tokenList.remove(0);
 
                 if(tokenList.get(0).getTokenNo() == 33){
                     tokenList.remove(0);
@@ -60,6 +60,21 @@ public class NTYPEL{
                     structOrTypeID.setLeft(expr);
                     
                 }
+
+                if(tokenList.get(0).getTokenNo() != 34){
+                    //error
+                }
+                tokenList.remove(0);
+
+                if(tokenList.get(0).getTokenNo() != 10){
+                    //error
+                }
+                tokenList.remove(0);
+
+                if(tokenList.get(0).getTokenNo() != 58){
+                    //error
+                }
+                tokenList.remove(0);
             }
             else if(tokenList.get(0).getTokenNo() == 58){
                 structOrTypeID.setNodeID("NRTYPE");

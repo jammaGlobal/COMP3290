@@ -4,6 +4,9 @@ Special <prlist> ::= <printitem>
     -left factoring-
         <prlist> ::= <printitem> opt_printlist
         opt_printlist ::= , <prlist> | e
+
+Special <printitem> ::= <expr>
+NSTRG <printitem> ::= <string>
 */
 import java.util.ArrayList; 
 public class NPRLST{
@@ -15,7 +18,7 @@ public class NPRLST{
         NPRLSTnode.setLeft(printitem);
 
         StNode opt_printlist = opt_printlist(tokenList, sTable);
-        NPRLSTnode.setLeft(opt_printlist);
+        NPRLSTnode.setRight(opt_printlist);
 
         return NPRLSTnode;
     }
@@ -34,7 +37,8 @@ public class NPRLST{
             tokenList.remove(0);
         }
         else{
-
+            StNode expr = NNOT.expr(tokenList, sTable);
+            printitem.setLeft(expr);
         }
 
 
@@ -47,6 +51,7 @@ public class NPRLST{
         if(tokenList.get(0).getTokenNo() == 32){
             tokenList.remove(0);
             StNode prlist = prlist(tokenList, sTable);
+            opt_printlist.setLeft(prlist);
         }
 
         return opt_printlist;

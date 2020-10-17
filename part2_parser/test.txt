@@ -1,5 +1,5 @@
 CD20 yo 
-/**constants
+constants
     COUNT = 10,
     YEAH = 5
 types
@@ -11,9 +11,17 @@ types
     groupMarks is array [COUNT] of mark
 arrays
     comp3290 : groupMarks
-**/
+
 main
-    i : bool 
+    i : int,
+    j : int 
+    
 begin
+    for(i = 10, j= 5; i > 0)
+        println "i is currently ", i , " and j is currently " , j ;
+        i = i - 1;
+        j += 1;
+    end
+
     println "Hello World" ;
 end CD20 yo

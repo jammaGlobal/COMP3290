@@ -76,6 +76,8 @@ public class NPOW{
         if(tokenList.get(0).getTokenNo() == 58){
             TableEntry entry = new TableEntry(tokenList.get(0));
             sTable.setTableEntry(entry);
+            var.setSymbolTableReference(entry);
+            //need to make symbol table ref
         }
         tokenList.remove(0);
 
@@ -92,6 +94,8 @@ public class NPOW{
         return var;
     } 
 
+    //      opt_lbrkt ::= [<expr>] . <id> | e 
+
     public static StNode opt_lbrkt(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode opt_lbrkt = new StNode();
 
@@ -101,28 +105,24 @@ public class NPOW{
             StNode expr = NNOT.expr(tokenList, sTable);
             opt_lbrkt.setLeft(expr);
 
-            if(tokenList.get(0).getTokenNo() == 57){
-                tokenList.remove(0);
-
-                if(tokenList.get(0).getTokenNo() == 58){
-                    TableEntry entry = new TableEntry(tokenList.get(0));
-                    sTable.setTableEntry(entry);
-
-                    return opt_lbrkt;
-                }
-                else{
-                    return null;
-                    //error
-                }
-            }
-            else{
-                return null;
+            if(tokenList.get(0).getTokenNo() != 34){
                 //error
             }
+            tokenList.remove(0);
+
+            if(tokenList.get(0).getTokenNo() != 57){
+                //error
+            }
+            tokenList.remove(0);
+
+            if(tokenList.get(0).getTokenNo() == 58){
+                TableEntry entry = new TableEntry(tokenList.get(0));
+                sTable.setTableEntry(entry);
+                opt_lbrkt.setSymbolTableReference(entry);
+            }
         }
-        else{
-            return opt_lbrkt;
-        }
+        return opt_lbrkt;
+
     }
 
     public static StNode rec_fact(ArrayList<Token> tokenList, SymbolTable sTable){
