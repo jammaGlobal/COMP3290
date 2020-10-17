@@ -84,7 +84,7 @@ public class NSTATS{
             StNode reptstat = NREPT.reptstat(tokenList,sTable);
             stat.setLeft(reptstat);
         }
-        else if(tokenList.get(0).getTokenNo() == 58 && tokenList.get(0).getTokenNo() != 35)
+        else if(tokenList.get(0).getTokenNo() == 58 && tokenList.get(1).getTokenNo() != 35)
         {
             StNode asgnstat = asgnstat(tokenList,sTable);
             stat.setLeft(asgnstat);
@@ -97,7 +97,7 @@ public class NSTATS{
             StNode iostat = iostat(tokenList,sTable);
             stat.setLeft(iostat);
         }
-        else if(tokenList.get(0).getTokenNo() == 58 && tokenList.get(0).getTokenNo() == 35){
+        else if(tokenList.get(0).getTokenNo() == 58 && tokenList.get(1).getTokenNo() == 35){
             StNode callstat = NCALL.callstat(tokenList,sTable);
             stat.setLeft(callstat);
         }
