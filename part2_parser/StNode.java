@@ -99,7 +99,7 @@ public class StNode {
         if(this.nodeID != NodeIdent.NUNDEF){
             out = this.nodeID + "\t";
             if(this.symTabRef != null && this.symTabRef.getType() == 58){
-                out += this.symTabRef.getName();
+                out += this.symTabRef.getName() + "\t";
 
             }
         }

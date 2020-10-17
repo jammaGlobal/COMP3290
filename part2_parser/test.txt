@@ -1,12 +1,19 @@
 CD20 yo 
-constants
+/**constants
     COUNT = 10,
     YEAH = 5
 types
     mark is
     id : int,
     midtem : real,
-    final : 
-    
-    main
+    end
+
+    groupMarks is array [COUNT] of mark
+arrays
+    comp3290 : groupMarks
+**/
+main
+    i : bool 
+begin
+    println "Hello World" ;
 end CD20 yo

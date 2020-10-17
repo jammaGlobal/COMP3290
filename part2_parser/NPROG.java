@@ -16,12 +16,12 @@ public class NPROG {
         }
         tokenList.remove(0);
         StNode NGLOBnode = NGLOB.globals(tokenList, sTable);
-        //StNode NFUNCSnode = NFUNCS.funcs(tokenList, sTable);
-        //StNode NMAINnode = NMAIN.mainbody(tokenList, sTable);
+        StNode NFUNCSnode = NFUNCS.funcs(tokenList, sTable);
+        StNode NMAINnode = NMAIN.mainbody(tokenList, sTable);
 
         NPROGnode.setLeft(NGLOBnode);
-        //NPROGnode.setMiddle(NFUNCSnode);
-        //NPROGnode.setRight(NMAINnode);
+        NPROGnode.setMiddle(NFUNCSnode);
+        NPROGnode.setRight(NMAINnode);
         
         return NPROGnode;
     } 

@@ -1,9 +1,18 @@
-//<typelist> ::= <type> opt_typelist
-//opt_typelist ::= <typelist> | ε
+/*
+NTYPEL <typelist> ::= <type> <typelist>
+Special <typelist> ::= <type>
+   -left factoring-
+       <typelist> ::= <type> opt_typelist
+       opt_typelist ::= <typelist> | ε
+
+NRTYPE <type> ::= <structid> is <fields> end
+NATYPE <type> ::= <typeid> is array [ <expr> ] of <structid>
+*/
 import java.util.ArrayList; 
 public class NTYPEL{
     public static StNode typelist(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode NTYPELnode = new StNode();
+        NTYPELnode.setNodeID("NTYPEL");
 
         
         if(tokenList.get(0).getTokenNo() == 58){
@@ -28,20 +37,22 @@ public class NTYPEL{
     public static StNode opt_typelist(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode opt_typelist = new StNode();
 
-        if(tokenList.get(0).getTokenNo() == 58){
-            StNode typelist = typelist(tokenList, sTable);
-            opt_typelist.setLeft(typelist);
-        }
+        StNode typelist = typelist(tokenList, sTable);
+        opt_typelist.setLeft(typelist);
 
         return opt_typelist;
     }
 
     public static StNode structOrTypeID(ArrayList<Token> tokenList, SymbolTable sTable, TableEntry ent){
         StNode structOrTypeID = new StNode();
+
+        structOrTypeID.setSymbolTableReference(ent);
+
         if(tokenList.get(0).getTokenNo() == 4){
             tokenList.remove(0);
             if(tokenList.get(0).getTokenNo() == 5){
                 structOrTypeID.setNodeID("NATYPE");
+                
 
                 if(tokenList.get(0).getTokenNo() == 33){
                     tokenList.remove(0);

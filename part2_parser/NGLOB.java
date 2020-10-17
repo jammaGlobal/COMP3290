@@ -28,7 +28,9 @@ public class NGLOB{
         if(tokenList.get(0).getTokenNo() == 4){
             tokenList.remove(0);
 
-           // StNode NALISTnode = NALIST.arrdecls(tokenList, sTable);
+            StNode NALISTnode = NALIST.arrdecls(tokenList, sTable);
+            arrays.setLeft(NALISTnode);
+
         }
 
         NGLOBnode.setLeft(consts);

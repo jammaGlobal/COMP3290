@@ -60,13 +60,15 @@ public class NNOT{
 
         if(tokenList.get(0).getTokenNo() == 38 || tokenList.get(0).getTokenNo() == 39){
             tokenList.remove(0);
+            
+            StNode term = term(tokenList, sTable);
+            rec_expr.setLeft(term);
+
+            StNode rec_expr_ = rec_expr(tokenList, sTable);
+            rec_expr.setRight(rec_expr_);
         }
 
-        StNode term = term(tokenList, sTable);
-        rec_expr.setLeft(term);
-
-        StNode rec_expr_ = rec_expr(tokenList, sTable);
-        rec_expr.setRight(rec_expr_);
+        
         
         return rec_expr;
     }

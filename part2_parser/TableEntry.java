@@ -4,6 +4,7 @@ public class TableEntry{
     private int lineNo;
     private int colNo;
 
+    //Symbol type will be introduced in the semantics && codegen
     public TableEntry(Token token){
         this.type = token.getTokenNo();
         this.name = token.getLexeme();
