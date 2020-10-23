@@ -5,33 +5,88 @@ Special <arrdecls> ::= <arrdecl>
         <arrdecls> ::= <arrdecl> opt_arrdecls
         opt_arrdecls ::= , <arrdecls> | ε
 
+    
+
 */
 import java.util.ArrayList; 
 public class NALIST{
     public static StNode arrdecls(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode NALISTnode = new StNode();
-        NALISTnode.setNodeID("NALIST");
+        
         
         StNode arrdecl = arrdecl(tokenList,sTable);
-        NALISTnode.setLeft(arrdecl);
+
+        //Case where there is an error in arrdecl
+        if(arrdecl.isNUNDEF()){
+            if(errorRecovery(tokenList,sTable)){
+
+            }
+            else{
+                NALISTnode.notEmptyContainsError();
+                return NALISTnode;
+            }
+        }
 
         StNode opt_arrdecls = opt_arrdecls(tokenList,sTable);
-        NALISTnode.setLeft(opt_arrdecls);
+
+        //The case where there is only arrdecl, opt_arrdecls is empty
+        if(opt_arrdecls == null && !arrdecl.isNUNDEF()){  
+            NALISTnode.setLeft(arrdecl);
+             return NALISTnode;
+        }
+        //there has been an error in the next arrdecl that is within the next arrdecls function
+        else if(opt_arrdecls == null && arrdecl.isNUNDEF()){
+            return NALISTnode;
+        }
+        else if(opt_arrdecls.isNotEmptyContainsError() && opt_arrdecls.isNUNDEF()){
+            NALISTnode.setNodeID("NALIST");
+            NALISTnode.setLeft(arrdecl);
+            return NALISTnode;
+        }
+
+        NALISTnode.setNodeID("NALIST");
+
+        NALISTnode.setLeft(arrdecl);
+        NALISTnode.setRight(opt_arrdecls);
 
         return NALISTnode;
     }
 
+    public static StNode opt_arrdecls(ArrayList<Token> tokenList, SymbolTable sTable){
+        StNode opt_arrdecls = new StNode();
+
+        if(tokenList.get(0).getTokenNo() == 32){
+            tokenList.remove(0);
+ 
+            StNode arrdecls = arrdecls(tokenList,sTable);
+            if(arrdecls.isNUNDEF() && arrdecls.isNotEmptyContainsError()){
+                opt_arrdecls.notEmptyContainsError();
+                return opt_arrdecls;
+            }
+
+            opt_arrdecls.setLeft(arrdecls);
+            return opt_arrdecls;
+        }
+        else{
+            return null;
+        }
+        
+    }
+
+    //This production cannot be empty, therefore it is fine to use an empty node to determine errors
     public static StNode arrdecl(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode arrdecl = new StNode();
-        arrdecl.setNodeID("NARRD");
+        
 
         if(tokenList.get(0).getTokenNo() != 58){
-            //error
+            String error = "Array declaration missing identifier";
+            sTable.parseError(tokenList.get(0), error);
+            //add detected error String to list somehow
+            return arrdecl;
         }
 
         TableEntry entry = new TableEntry(tokenList.get(0));
-        sTable.setTableEntry(entry);
-        arrdecl.setSymbolTableReference(entry);
+        
 
         tokenList.remove(0);
 
@@ -39,7 +94,9 @@ public class NALIST{
             tokenList.remove(0);
 
             if(tokenList.get(0).getTokenNo() != 58){
-                //error
+                String error = "Array declaration missing type id";
+                sTable.parseError(tokenList.get(0), error);
+                return arrdecl;
             }
             
             TableEntry ent = new TableEntry(tokenList.get(0));
@@ -48,23 +105,62 @@ public class NALIST{
             tokenList.remove(0);
         }
         else{
-            //error
+            String error = "Array declaration missing colon operator ':'";
+            sTable.parseError(tokenList.get(0), error);
+            return arrdecl;
         }
 
+        sTable.setTableEntry(entry);
+        arrdecl.setSymbolTableReference(entry);
 
+        arrdecl.setNodeID("NARRD");
         return arrdecl;
     }
 
-    public static StNode opt_arrdecls(ArrayList<Token> tokenList, SymbolTable sTable){
-        StNode opt_arrdecls = new StNode();
+    public static boolean errorRecovery(ArrayList<Token> tokenList, SymbolTable sTable){
 
-        if(tokenList.get(0).getTokenNo() == 32){
-            tokenList.remove(0);
+        int tokPos = -1;
+        int tokNo = 0;
 
-            StNode arrdecls = arrdecls(tokenList,sTable);
-            opt_arrdecls.setLeft(arrdecls);
+        for(int i = 0; i < tokenList.size() ; i++){
+            if(tokenList.get(i).getTokenNo() == 32 || tokenList.get(i).getTokenNo() == 11 || 
+                tokenList.get(i).getTokenNo() == 6){
+                tokPos = i;
+                tokNo = tokenList.get(i).getTokenNo();
+                break;
+            }
         }
 
-        return opt_arrdecls;
+        if(tokPos == -1){
+            //Unsuccessful error recovery
+            return false;
+        }
+        else{
+            //Found comma before funcs and before main
+            if(tokNo == 32){
+                while(tokenList.get(0).getTokenNo() != 32){
+                    tokenList.remove(0);
+                }
+            }
+            //Found no comma and found funcs before main
+            else if(tokNo == 11){
+                while(tokenList.get(0).getTokenNo() != 11){
+                    tokenList.remove(0);
+                }
+            }
+            //Found no comma or funcs and found main
+            else if(tokNo == 6){
+                while(tokenList.get(0).getTokenNo() != 6){
+                    tokenList.remove(0);
+                }
+            }
+            return true;
+        }
+        //check next comma 
+        //check next function
+        //check main
+        
     }
+
+    
 }

@@ -23,9 +23,12 @@ public class NNOT{
         }
 
         StNode expr = expr(tokenList, sTable);
+
         NNOTnode.setLeft(expr);
 
         StNode opt_relop = opt_relop(tokenList, sTable);
+
+
         NNOTnode.setRight(opt_relop);
 
         return NNOTnode;
@@ -49,6 +52,7 @@ public class NNOT{
         }
 
         StNode rec_expr = rec_expr(tokenList,sTable);
+
         expr.setRight(rec_expr);
         
         return expr;
@@ -62,6 +66,7 @@ public class NNOT{
             tokenList.remove(0);
             
             StNode term = term(tokenList, sTable);
+
             rec_expr.setLeft(term);
 
             StNode rec_expr_ = rec_expr(tokenList, sTable);
@@ -80,6 +85,7 @@ public class NNOT{
         StNode term = new StNode();
 
         StNode fact = NPOW.fact(tokenList, sTable);
+
         term.setLeft(fact);
 
         if(tokenList.get(0).getTokenNo() == 40){
@@ -126,6 +132,7 @@ public class NNOT{
         opt_relop.setLeft(relop);
 
         StNode expr = expr(tokenList, sTable);
+
         expr.setRight(expr);
 
         return opt_relop;
@@ -165,7 +172,7 @@ public class NNOT{
             return relop;
         }
         else{
-            return null;
+            return relop;
         }
     }
 }

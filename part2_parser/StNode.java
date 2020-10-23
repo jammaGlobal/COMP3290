@@ -11,7 +11,7 @@ public class StNode {
         NPLIST, NSIMP, NARRP, NARRC, NDLIST,
         NSTATS, NFOR, NREPT, NASGNS, NIFTH,
         NIFTE, NASGN, NPLEQ, NMNEQ, NSTEQ, NDVEQ,
-        NIPUT, NPRINT, NPRLN, NCALL, NRETN, NVLIST,
+        NINPUT, NPRINT, NPRLN, NCALL, NRETN, NVLIST,
         NSIMV, NARRV, NEXPL, NBOOL, NNOT, NAND,
         NOR, NXOR, NEQL, NNEQ, NGRT, NGEQ, NLEQ,
         NLSS, NADD, NSUB, NMUL, NDIV, NMOD,
@@ -26,6 +26,7 @@ public class StNode {
     private TableEntry symTabRef;
     private int noChildren;
     private HashMap<Token, String> errors;
+    private boolean notEmptyContainsError;
 
 
     public StNode(){
@@ -37,6 +38,7 @@ public class StNode {
         nodeID = NodeIdent.NUNDEF;
         symTabRef = null;
         errors = new HashMap<Token, String>();
+        notEmptyContainsError = false;
 
     }
 
@@ -92,6 +94,26 @@ public class StNode {
 
     public void setNodeID(String id){
         this.nodeID = NodeIdent.valueOf(id);
+    }
+
+    public String getNodeID(){
+        return String.valueOf(this.nodeID);
+    }
+
+    public boolean isNUNDEF(){
+        if(nodeID == NodeIdent.NUNDEF){
+            return true;
+        }
+        else 
+            return false;
+    }
+
+    public void notEmptyContainsError(){
+        notEmptyContainsError = true;
+    }
+
+    public boolean isNotEmptyContainsError(){
+        return notEmptyContainsError;
     }
 
     public String output(){

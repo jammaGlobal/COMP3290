@@ -1,4 +1,5 @@
-import java.util.ArrayList; 
+import java.util.ArrayList;
+import java.util.LinkedList; 
 
 //Some errors will be derived from null returns, some returns are legitimate null returns like when an e option is available
 //returns must be legit nodes, null, and error node
@@ -11,13 +12,13 @@ public class CDParser{
 
     ArrayList<Token> tokenList;
     SymbolTable symTable;
-    ArrayList<Token> errorListing;
+    //there is a singleton class error list within the symbolTable which can be accessed
     StNode root;
+    
 
     public CDParser(ArrayList<Token> totalTokens){
         tokenList = totalTokens;
         symTable = new SymbolTable();
-        errorListing = new ArrayList<Token>();
         root = null;
     }
 
@@ -29,16 +30,21 @@ public class CDParser{
             root = NPROG.program(tokenList, symTable);
         }
         else{
-            //syntax error, end parse
+            String error = "Program missing initial CD20 keyword";
+            symTable.parseError(tokenList.get(0), error);
         }   
     }
 
     public void printProgramListing(){
         preorderTraversal(root);
+        System.out.println("");
     }
 
     public void printErrorListing(){
-        //yeah
+        LinkedList<String> errorList = symTable.returnErrorList();
+        for(int i = 0; i < errorList.size() ; i++){
+            System.out.println(errorList.get(i));
+        }
     }
 
     //has to traverse middle children as well

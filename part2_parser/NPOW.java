@@ -9,6 +9,7 @@ public class NPOW{
         NPOWnode.setNodeID("NPOW");
 
         StNode exponent = exponent(tokenList, sTable);
+
         NPOWnode.setLeft(exponent);
 
         StNode rec_fact = rec_fact(tokenList, sTable);
@@ -137,12 +138,10 @@ public class NPOW{
             StNode rec_fact_ = rec_fact(tokenList, sTable);
             rec_fact.setRight(rec_fact_);
 
-            return rec_fact;
-        }
-        else{
-            return null;
+            
         }
 
+        return rec_fact;
 
     }
 }

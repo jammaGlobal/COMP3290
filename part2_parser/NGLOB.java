@@ -2,7 +2,7 @@ import java.util.ArrayList;
 public class NGLOB{
     public static StNode globals(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode NGLOBnode = new StNode();
-        NGLOBnode.setNodeID("NGLOB");
+        
 
         //Now in Special <consts>
         StNode consts = new StNode();
@@ -10,7 +10,11 @@ public class NGLOB{
             tokenList.remove(0);
 
             StNode NILISTnode = NILIST.initlist(tokenList, sTable);
-            consts.setLeft(NILISTnode);
+
+            if(NILISTnode.isNUNDEF()){
+                consts.setLeft(NILISTnode);
+            }
+            
         }
 
 
@@ -29,13 +33,21 @@ public class NGLOB{
             tokenList.remove(0);
 
             StNode NALISTnode = NALIST.arrdecls(tokenList, sTable);
-            arrays.setLeft(NALISTnode);
+            if(NALISTnode.isNUNDEF() && NALISTnode.isNotEmptyContainsError()){
+
+            }
+            else{
+                arrays.setLeft(NALISTnode);
+            }
+            
 
         }
 
         NGLOBnode.setLeft(consts);
         NGLOBnode.setMiddle(types);
         NGLOBnode.setRight(arrays);
+
+        NGLOBnode.setNodeID("NGLOB");
 
         return NGLOBnode;
     }

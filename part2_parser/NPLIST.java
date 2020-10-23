@@ -48,6 +48,7 @@ public class NPLIST{
                 param.setLeft(arrdecl);
                 param.setNodeID("NARRP");
             }
+
         }
 
         return param;
@@ -56,13 +57,13 @@ public class NPLIST{
     public static StNode opt_params(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode opt_params = new StNode();
 
-        if(tokenList.get(0).getTokenNo() != 32){
-            //error
-        }
-        tokenList.remove(0);
+        if(tokenList.get(0).getTokenNo() == 32){
+            tokenList.remove(0);
 
-        StNode params = params(tokenList,sTable);
-        opt_params.setLeft(params);
+            StNode params = params(tokenList,sTable);
+            opt_params.setLeft(params);
+        }
+        
 
         return opt_params;
     }

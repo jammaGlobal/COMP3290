@@ -168,13 +168,20 @@ public class NSTATS{
             tokenList.remove(0);
         }
         else{
+
             //error
         }
 
-        if(tokenList.get(0).getTokenNo() == 25){
-            //don't know how to look ahead cleanly yet
+        //expr function has too many possible beginning terminals so we need to return nulls to determine
+        //if they are
+
+        if(tokenList.get(0).getTokenNo() == 56){
+
         }
-        
+        else{
+            StNode expr = NNOT.expr(tokenList, sTable);
+            returnstat.setLeft(expr);
+        }
 
         return returnstat;
     }

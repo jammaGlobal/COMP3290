@@ -41,10 +41,11 @@ public class NMAIN {
             //error
         }
 
+        /*
         TableEntry entry = new TableEntry(tokenList.get(0));
         sTable.setTableEntry(entry);
         NMAINnode.setSymbolTableReference(entry);
-            
+        */
         tokenList.remove(0);
 
         return NMAINnode;

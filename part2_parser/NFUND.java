@@ -65,9 +65,11 @@ public class NFUND{
     public static StNode plist(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode plist = new StNode();
 
-        StNode params = NPLIST.params(tokenList,sTable);
-        //if params returns null then put to empty
-        plist.setLeft(params);
+        if(tokenList.get(0).getTokenNo() != 36){
+            StNode params = NPLIST.params(tokenList,sTable);
+            //if params returns null then put to empty
+            plist.setLeft(params);
+        }
 
 
         return plist;

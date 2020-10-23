@@ -36,9 +36,6 @@ public class NBOOL{
             StNode rec_boolNode_ = rec_bool(tokenList,sTable);
             rec_boolNode.setLeft(rec_boolNode_);
         }
-        else{
-            rec_boolNode = null;
-        }
 
         return rec_boolNode;
 
