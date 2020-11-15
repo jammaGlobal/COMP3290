@@ -6,49 +6,76 @@ public class NFOR{
 
     public static StNode forstat(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode NFORnode = new StNode();
-        NFORnode.setNodeID("NFOR");
+        
         
         if(tokenList.get(0).getTokenNo() != 17){
-            //error
+            String error = "For statement missing initial 'for' keyword";
+            sTable.parseError(tokenList.get(0), error);
+            return NFORnode;
         }
         tokenList.remove(0);
 
         if(tokenList.get(0).getTokenNo() != 35){
-            //error
+            String error = "For statement missing left parenthesis '('";
+            sTable.parseError(tokenList.get(0), error);
+            return NFORnode;
         }
         tokenList.remove(0);
 
         if(tokenList.get(0).getTokenNo() != 58){
-            //error
+            String error = "For statement missing identifier";
+            sTable.parseError(tokenList.get(0), error);
+            return NFORnode;
         }
 
         StNode asgnlist = NASGNS.asgnlist(tokenList, sTable);
-        NFORnode.setLeft(asgnlist);
+        if(asgnlist.isNUNDEF() && asgnlist.isNotEmptyContainsError()){
+            return NFORnode;
+        }
+
 
         if(tokenList.get(0).getTokenNo() != 56){
-            //error
+            String error = "For statement missing semicolon";
+            sTable.parseError(tokenList.get(0), error);
+            return NFORnode;
         }
         tokenList.remove(0);
 
-        if(tokenList.get(0).getTokenNo() != 58){
-            //error
+        if(tokenList.get(0).getTokenNo() != 58){        //might have to get rid of this identifier if statement
+            String error = "For statement missing identifier in conditional boolean";
+            sTable.parseError(tokenList.get(0), error);
+            return NFORnode;
         }
 
         StNode bool = NBOOL.bool(tokenList, sTable);
-        NFORnode.setMiddle(bool);
+        if(bool.isNUNDEF() && bool.isNotEmptyContainsError()){
+            return NFORnode;
+        }
         
         if(tokenList.get(0).getTokenNo() != 36){
-            //error
+            String error = "For statement missing right parenthesis ')'";
+            sTable.parseError(tokenList.get(0), error);
+            return NFORnode;
         }
         tokenList.remove(0);
 
         StNode stats = NSTATS.stats(tokenList, sTable);
-        NFORnode.setRight(stats);
+        if(stats.isNUNDEF() && stats.isNotEmptyContainsError()){
+            return NFORnode;
+        }
 
         if(tokenList.get(0).getTokenNo() != 8){
-            //error
+            String error = "For statement missing 'end' keyword";
+            sTable.parseError(tokenList.get(0), error);
+            return NFORnode;
         }
         tokenList.remove(0);
+
+        NFORnode.setLeft(asgnlist);
+        NFORnode.setMiddle(bool);
+        NFORnode.setRight(stats);
+
+        NFORnode.setNodeID("NFOR");
 
         return NFORnode;
     }

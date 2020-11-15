@@ -10,10 +10,10 @@ public class NGLOB{
             tokenList.remove(0);
 
             StNode NILISTnode = NILIST.initlist(tokenList, sTable);
-
-            if(NILISTnode.isNUNDEF()){
+            if(!NILISTnode.isNotEmptyContainsError()){
                 consts.setLeft(NILISTnode);
             }
+            
             
         }
 
@@ -23,24 +23,22 @@ public class NGLOB{
             tokenList.remove(0);
 
             StNode NTYPELnode = NTYPEL.typelist(tokenList, sTable);
-            types.setLeft(NTYPELnode);
+            if(!NTYPELnode.isNotEmptyContainsError()){
+                types.setLeft(NTYPELnode);
+            }
+
             
         }
-
 
         StNode arrays = new StNode();
         if(tokenList.get(0).getTokenNo() == 5){
             tokenList.remove(0);
 
             StNode NALISTnode = NALIST.arrdecls(tokenList, sTable);
-            if(NALISTnode.isNUNDEF() && NALISTnode.isNotEmptyContainsError()){
-
-            }
-            else{
+            if(!NALISTnode.isNotEmptyContainsError()){
                 arrays.setLeft(NALISTnode);
             }
             
-
         }
 
         NGLOBnode.setLeft(consts);

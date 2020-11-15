@@ -42,9 +42,6 @@ CD20 e
           myShape[i].y = y;
           return;
         end
-
-
-
    main
     numPoints : int,
     area : real,
@@ -54,7 +51,7 @@ CD20 e
    begin
     /-- Get how many points there are in the shape
     /-- Creating however many points 
-    for(=0; i<=numPoints)
+    for(i=0; i<=numPoints)
       newPoint(i, myShape);
       i += 1;
     end

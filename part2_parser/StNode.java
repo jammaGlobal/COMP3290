@@ -2,6 +2,7 @@
 //through syntax tree nodes with a pointer
 import java.util.HashMap;
 import java.util.Map;
+import java.io.*;
 public class StNode {
     public enum NodeIdent{
         NUNDEF,
@@ -27,6 +28,7 @@ public class StNode {
     private int noChildren;
     private HashMap<Token, String> errors;
     private boolean notEmptyContainsError;
+    private static int count = 0;
 
 
     public StNode(){
@@ -80,6 +82,10 @@ public class StNode {
         symTabRef = entry;
     }
 
+    public TableEntry getSymbolTableReference(){
+        return symTabRef;
+    }
+
     public StNode getLeft(){
         return this.left;
     }
@@ -131,9 +137,162 @@ public class StNode {
  
     }
 
-    public void addError(){
-        //
+    private static BufferedWriter lstFileWriter;
+    public static void setLstFileWriter(BufferedWriter fileWriter) { lstFileWriter = fileWriter;}
+
+    private static BufferedWriter xmlFileWriter;
+    public static void setXmlFileWriter (BufferedWriter fileWriter) {
+        xmlFileWriter = fileWriter;
     }
+
+    public static void printTree(StNode tr, String childType) throws IOException{
+
+        if (tr.getNodeID().equals("NUNDEF") && tr.getNoChildren() == 0) {
+            return;
+        }
+
+        if(tr.getNodeID().equals("NDIV")){
+            int p = 0;
+        }
+
+        if (tr.getNodeID().equals("NPROG")) {
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("<root>\n");
+            }
+            count = 0;
+        }
+
+        if (xmlFileWriter != null) {
+            xmlFileWriter.append("<nodeType value=\"" + tr.getNodeID() + " \"/>\n");
+        }
+
+        if(!tr.isNUNDEF()){
+            String nodeType = tr.getNodeID() + " ";
+            nodeType = padToSeven(nodeType);
+
+            System.out.print(nodeType);
+            lstFileWriter.append(nodeType);
+            count++;
+        }
+        
+
+        if (count > 10)  {
+            count = 0;
+            System.out.println();
+            lstFileWriter.append("\n");
+        }
+
+        if (tr.getSymbolTableReference() != null) {
+            String toPrint = tr.getSymbolTableReference().getName() + " "; //might be wrong
+
+            if (xmlFileWriter != null) {
+                String toPrintXml = toPrint.replace("\"", "");
+                xmlFileWriter.append("<nodeSymbolValue value=\"" + toPrintXml + " \"/>\n");
+            }
+
+            toPrint = padToSeven(toPrint);
+            System.out.print(toPrint);
+            lstFileWriter.append(toPrint);
+
+            int countIncreaseBy = (toPrint.length() / 7);
+            count += countIncreaseBy;
+            if (count >= 10) {
+                count = 0;
+                System.out.println();
+                lstFileWriter.append("\n");
+            };
+        }
+
+
+        // pre-order traversal of syntax tree
+        if (tr.left   != null) {
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("<child which=\"left\">\n");
+            }
+
+            printTree(tr.left, "left");
+
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("</child>\n");
+            }
+        }
+
+        if (tr.middle != null) {
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("<child which=\"middle\">\n");
+            }
+
+            printTree(tr.middle, "middle");
+
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("</child>\n");
+            }
+        }
+
+        if (tr.right  != null) {
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("<child which=\"right\">\n");
+            }
+
+            printTree(tr.right, "right");
+
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("</child>\n");
+            }
+        }
+
+        /*if (tr.nodeValue == NPROG && count % 7 != 0) {
+            System.out.println();
+        };*/
+
+        if (tr.getNodeID().equals("NPROG")) {
+            if (xmlFileWriter != null) {
+                xmlFileWriter.append("</root>");
+            }
+        }
+        
+        
+
+        
+
+        
+
+        // if(root != null){
+        //         System.out.print(root.output());
+        //     if(root.getNoChildren() == 1){
+        //         printTree(root.getLeft(), "left");
+        //     }
+        //     else if(root.getNoChildren() == 2){
+        //         printTree(root.getLeft(), "left"); 
+        //         printTree(root.getRight(), "right");
+        //     }
+        //     else if(root.getNoChildren() == 3){
+        //         printTree(root.getLeft(), "left");
+        //         printTree(root.getMiddle(), "middle");
+        //         printTree(root.getRight(), "right");
+        //     }
+        //     else if(root.getNoChildren() == 0){
+        //         //nothing
+        //     }
+        //     else{
+        //         System.out.print("Node has too many children");
+        //     }
+
+        // }
+    }
+
+    public static String padToSeven (String s) {
+        if (s.length() % 7 == 0) {
+            return s;
+        }
+
+        int paddingAmount = 7 - (s.length() % 7);
+        for (int i = 0; i < paddingAmount; i++) {
+            s += " ";
+        }
+        return s;
+    }
+
 
 
 

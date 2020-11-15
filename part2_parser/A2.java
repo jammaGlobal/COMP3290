@@ -11,6 +11,7 @@ public class A2{
 		String filename;
 		CDScanner inputScanner;
 		ArrayList<Token> tokenList = new ArrayList<Token>();
+		boolean scannerContainsError = false;
 
 		try {
 			filename = args[0]; 
@@ -27,6 +28,9 @@ public class A2{
 			do{
 				try{
 					Token currentToken = inputScanner.scan();
+					if(currentToken.getTokenNo() == 62){
+						scannerContainsError = true;
+					}
 					tokenList.add(currentToken);
 					//inputScanner.printToken(currentToken);
 				}catch(Exception e){
@@ -41,9 +45,15 @@ public class A2{
 		//inputScanner.printToken(inputScanner.EOFToken());
 		tokenList.add(inputScanner.EOFToken());
 
+		if(scannerContainsError){
+			System.out.println("Detected lexical error(s) within inputted source code. Source code will not proceed to syntax analysis."+"\n"+"Compiler terminated...");
+			return;
+		}
+
 		CDParser parser = new CDParser(tokenList);
 		parser.startParse();
-		parser.printProgramListing();
+		//parser.printProgramListing();
+		parser.printProgramListing("debug");
 		parser.printErrorListing();
 	}
 }

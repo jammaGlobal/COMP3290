@@ -1,0 +1,38 @@
+CD20 a4_3
+types
+    student is
+        age : int,
+        year : int,
+        isCool : bool
+    end
+
+    students is array [5] of student
+
+arrays
+    sList  students,
+    shitheads : students
+    annoying : students
+
+
+func squareSum (a : int, b : int) : int
+
+    tmp : int
+
+    begin
+        tmp = a^2;
+        tmp += b^2;
+        return tmp;
+    end
+
+
+main
+    i : int,
+    j : int,
+    k : int
+    
+begin
+    i = 2;
+    j = 4;
+    k = squareSum(i,j);
+    
+end CD20 a4_3

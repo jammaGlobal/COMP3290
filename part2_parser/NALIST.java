@@ -1,5 +1,5 @@
 /*
-NALIST <arrdecls> ::= <arrdecl> , <arrdecls>
+NALIST <arrdecls> ::= < > , <arrdecls>
 Special <arrdecls> ::= <arrdecl>
     -left factoring-
         <arrdecls> ::= <arrdecl> opt_arrdecls
@@ -32,14 +32,15 @@ public class NALIST{
         //The case where there is only arrdecl, opt_arrdecls is empty
         if(opt_arrdecls == null && !arrdecl.isNUNDEF()){  
             NALISTnode.setLeft(arrdecl);
-             return NALISTnode;
+            return NALISTnode;
         }
         //there has been an error in the next arrdecl that is within the next arrdecls function
         else if(opt_arrdecls == null && arrdecl.isNUNDEF()){
             return NALISTnode;
         }
-        else if(opt_arrdecls.isNotEmptyContainsError() && opt_arrdecls.isNUNDEF()){
-            NALISTnode.setNodeID("NALIST");
+        // not null condition to differentiate from an empty or a node that hasnt been arrived at due to arrdecl
+        // error recovery, node ID is not set as the error has occurred just after a successful comma find; within next arrr
+        else if(opt_arrdecls != null && (opt_arrdecls.isNotEmptyContainsError() && opt_arrdecls.isNUNDEF())){
             NALISTnode.setLeft(arrdecl);
             return NALISTnode;
         }
@@ -81,7 +82,6 @@ public class NALIST{
         if(tokenList.get(0).getTokenNo() != 58){
             String error = "Array declaration missing identifier";
             sTable.parseError(tokenList.get(0), error);
-            //add detected error String to list somehow
             return arrdecl;
         }
 

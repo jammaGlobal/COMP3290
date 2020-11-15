@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.LinkedList; 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 //Some errors will be derived from null returns, some returns are legitimate null returns like when an e option is available
 //returns must be legit nodes, null, and error node
@@ -28,6 +31,10 @@ public class CDParser{
         if(tokenList.get(0).getTokenNo() == 1){
             tokenList.remove(0);
             root = NPROG.program(tokenList, symTable);
+            if(root.isNUNDEF()){
+                System.out.println("Error(s) occur in positions that harm MAIN scope integrity/cannot be recovered from");
+                System.out.println("No program listing will be produced");
+            }
         }
         else{
             String error = "Program missing initial CD20 keyword";
@@ -40,7 +47,30 @@ public class CDParser{
         System.out.println("");
     }
 
+    //For xml printing
+    public void printProgramListing(String mode){
+        System.out.println("");
+        try {
+            BufferedWriter lstFileWriter = new BufferedWriter(new FileWriter("output.lst", false));
+            StNode.setLstFileWriter(lstFileWriter);
+            lstFileWriter.write("");
+
+            BufferedWriter xmlFileWriter = new BufferedWriter(new FileWriter("treeOutput.xml", false));
+            StNode.setXmlFileWriter(xmlFileWriter);
+            xmlFileWriter.write("");
+            StNode.printTree(root, "");
+            xmlFileWriter.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        // preorderTraversal(root);
+        // System.out.println("");
+    }
+
     public void printErrorListing(){
+        System.out.println("");
         LinkedList<String> errorList = symTable.returnErrorList();
         for(int i = 0; i < errorList.size() ; i++){
             System.out.println(errorList.get(i));

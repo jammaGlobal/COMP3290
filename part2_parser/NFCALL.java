@@ -4,13 +4,16 @@ import java.util.ArrayList;
 public class NFCALL{
     public static StNode fncall(ArrayList<Token> tokenList, SymbolTable sTable){
         StNode NFCALLnode = new StNode();
-        if(tokenList.get(0).getTokenNo() == 58){
-            TableEntry entry = new TableEntry(tokenList.get(0));
-            sTable.setTableEntry(entry);
+
+        if(tokenList.get(0).getTokenNo() != 58){
+            String error = "Function call missing initial identifier";
+            sTable.parseError(tokenList.get(0), error);
+            return NFCALLnode;
         }
-        else{
-            //return error, however the precondition for this function is that there is
-        }
+
+        TableEntry entry = new TableEntry(tokenList.get(0));
+        
+
 
         tokenList.remove(0);
         
@@ -18,19 +21,29 @@ public class NFCALL{
             tokenList.remove(0);
         }
         else{
-            //error
+            String error = "Function call missing left parenthesis";
+            sTable.parseError(tokenList.get(0), error);
+            return NFCALLnode;
         }
 
         StNode opt_elist = opt_elist(tokenList, sTable);
+        if(opt_elist.isNUNDEF() && opt_elist.isNotEmptyContainsError()){
+            return NFCALLnode;
+        }
         NFCALLnode.setLeft(opt_elist);
 
         if(tokenList.get(0).getTokenNo() == 36){
             tokenList.remove(0);
         }
         else{
-            //error, unclosed bracket
+            String error = "Function call missing right parenthesis";
+            sTable.parseError(tokenList.get(0), error);
+            return NFCALLnode;
         }
 
+        sTable.setTableEntry(entry);
+        NFCALLnode.setSymbolTableReference(entry);
+        NFCALLnode.setNodeID("NFCALL");
 
         return NFCALLnode;
     }
@@ -42,6 +55,9 @@ public class NFCALL{
         StNode opt_elist = new StNode();
 
         StNode elist = NEXPL.elist(tokenList, sTable);
+        if(elist.isNUNDEF() && elist.isNotEmptyContainsError()){
+            return null;
+        }
         opt_elist.setLeft(elist);
 
         return opt_elist;

@@ -14,26 +14,36 @@ public class NIFTH{
         StNode NIFTHnode = new StNode();
 
         if(tokenList.get(0).getTokenNo() != 20){
-            //error
+            String error = "If statement missing initial 'if' keyword";
+            sTable.parseError(tokenList.get(0), error);
+            return NIFTHnode;
         }
         tokenList.remove(0);
 
 
         if(tokenList.get(0).getTokenNo() != 35){
-            //error
+            String error = "If statement missing left parenthesis '('";
+            sTable.parseError(tokenList.get(0), error);
+            return NIFTHnode;
         }
         tokenList.remove(0);
 
         StNode bool = NBOOL.bool(tokenList, sTable);
-        NIFTHnode.setLeft(bool);
+        if(bool.isNUNDEF() && bool.isNotEmptyContainsError()){
+            return NIFTHnode;
+        }
 
         if(tokenList.get(0).getTokenNo() != 36){
-            //error
+            String error = "If statement missing right parenthesis ')'";
+            sTable.parseError(tokenList.get(0), error);
+            return NIFTHnode;
         }
         tokenList.remove(0);
 
         StNode stats = NSTATS.stats(tokenList, sTable);
-        
+        if(stats.isNUNDEF() && stats.isNotEmptyContainsError()){
+            return NIFTHnode;
+        }
 
         if(tokenList.get(0).getTokenNo() == 8){
             NIFTHnode.setRight(stats);
@@ -41,24 +51,33 @@ public class NIFTH{
             NIFTHnode.setNodeID("NIFTH");
         }
         else if(tokenList.get(0).getTokenNo() == 21){
-            NIFTHnode.setMiddle(stats);
+            
             tokenList.remove(0);
 
             StNode stats_ = NSTATS.stats(tokenList, sTable);
-            NIFTHnode.setRight(stats_);
+            if(stats_.isNUNDEF() && stats_.isNotEmptyContainsError()){
+                return NIFTHnode;
+            }
+            
 
             if(tokenList.get(0).getTokenNo() != 8){
-
+                String error = "If statement missing 'end' keyword";
+                sTable.parseError(tokenList.get(0), error);
+                return NIFTHnode;
             }
             tokenList.remove(0);
+
+            NIFTHnode.setMiddle(stats);
+            NIFTHnode.setRight(stats_);
             NIFTHnode.setNodeID("NIFTE");
         }
         else{
-            //error
+            String error = "If statement missing 'end' keyword if not if-statement with 'else' keyword OR missing 'else' keyword";
+            sTable.parseError(tokenList.get(0), error);
+            return NIFTHnode;
         }
 
-
-        
+        NIFTHnode.setLeft(bool);
         
         return NIFTHnode;
     }
