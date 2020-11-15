@@ -52,26 +52,12 @@ CD20 e
     j : int
 
    begin
-    /-- Get how many points there are in the shape
-    /-- Creating however many points 
-    for(=0; i<=numPoints)
-      newPoint(i, myShape);
-      i += 1;
-    end
 
-    /-- adding the first point to the last point
-    myShape[numPoints].x=myShape[0].x;
-    myShape[numPoints].y=myShape[0].y;
-    /-- Calculating the area
-    area = 0;
-    
-    for(j=0; j<=numPoints + 1)
-      area += 10;
-      j +=1;
-    end
-    
-    area = area/2;
-    println " The Area is found to be ", area;
+    repeat (=i-1, j=j+1)
+      println "i is currently ", i, " and j is currently ", j ;
+      i = i + 1;
+      j -= 1;
+    until i == 10;
    
    end 
 

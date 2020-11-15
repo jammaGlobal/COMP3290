@@ -32,12 +32,11 @@ public class NSTATS{
                 NSTATSnode.setLeft(strstat);
                 return NSTATSnode;
             }
-            //there has been an error in the next arrdecl that is within the next arrdecls function
+            //there has been an error in the next statement that is within the next arrdecls function
             else if(opt_stats == null && strstat.isNotEmptyContainsError()){
                 return NSTATSnode;
             }
-            // not null condition to differentiate from an empty or a node that hasnt been arrived at due to arrdecl
-            // error recovery, node ID is not set as the error has occurred just after a successful comma find; within next arrr
+            
             else if(opt_stats != null && (opt_stats.isNotEmptyContainsError() && opt_stats.isNUNDEF())){
                 NSTATSnode.setLeft(strstat);
                 return NSTATSnode;
@@ -363,7 +362,7 @@ public class NSTATS{
 
         for(int i = 0; i < tokenList.size() ; i++){
             if(tokenList.get(i).getTokenNo() == 56){
-                if(checkIfStatTokenNext(tokenList, 1)){
+                if(checkIfStatTokenNext(tokenList, i)){
                     tokPos = i;
                 }
                 break;

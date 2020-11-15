@@ -42,13 +42,13 @@ public class CDParser{
         }   
     }
 
-    public void printProgramListing(){
-        preorderTraversal(root);
-        System.out.println("");
-    }
+    // public void printProgramListing(){
+    //     preorderTraversal(root);
+    //     System.out.println("");
+    // }
 
     //For xml printing
-    public void printProgramListing(String mode){
+    public void printProgramListing(){
         System.out.println("");
         try {
             BufferedWriter lstFileWriter = new BufferedWriter(new FileWriter("output.lst", false));
@@ -58,7 +58,7 @@ public class CDParser{
             BufferedWriter xmlFileWriter = new BufferedWriter(new FileWriter("treeOutput.xml", false));
             StNode.setXmlFileWriter(xmlFileWriter);
             xmlFileWriter.write("");
-            StNode.printTree(root, "");
+            StNode.printTreePreOrder(root, "");
             xmlFileWriter.close();
 
         } catch (Exception e) {

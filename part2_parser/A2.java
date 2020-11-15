@@ -52,8 +52,7 @@ public class A2{
 
 		CDParser parser = new CDParser(tokenList);
 		parser.startParse();
-		//parser.printProgramListing();
-		parser.printProgramListing("debug");
+		parser.printProgramListing();
 		parser.printErrorListing();
 	}
 }
